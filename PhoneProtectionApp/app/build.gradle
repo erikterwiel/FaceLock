@@ -35,6 +35,7 @@ dependencies {
     implementation 'com.amazonaws:aws-android-sdk-ddb-mapper:2.6.6'
     implementation 'com.android.support:recyclerview-v7:26.1.0'
     implementation 'com.android.support:design:26.1.0'
+    implementation 'com.google.android.gms:play-services:11.6.0'
 }
 repositories {
     mavenCentral()

@@ -1,13 +1,20 @@
 package erikterwiel.phoneprotection;
 
+import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -35,6 +42,9 @@ import com.amazonaws.services.rekognition.model.DetectLabelsResult;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.w3c.dom.Text;
 
@@ -51,19 +61,25 @@ public class HomeActivity extends AppCompatActivity {
     private static final String POOL_REGION = "us-east-1";
     private static final String BUCKET_NAME = "phoneprotectionpictures";
     private static final int REQUEST_PHONE = 102;
+    private static final int REQUEST_ADD = 103;
 
     private TransferUtility mTransferUtility;
     private AmazonS3Client mS3Client;
     private AWSCredentialsProvider mCredentialsProvider;
     private AmazonDynamoDBClient mDDBClient;
     private DynamoDBMapper mMapper;
+    private FusedLocationProviderClient mFusedLocationClient;
     private Username mPhone;
     private ArrayList<HashMap<String, Object>> mTransferRecordMaps = new ArrayList<>();
     private ArrayList<User> mUserList = new ArrayList<>();
     private int mCompletedDownloads;
     private RecyclerView mUsers;
     private UserAdapter mUserAdapter;
+    private Location mLocation;
     private MenuItem mSettings;
+    private TextView mName;
+    private TextView mLatitude;
+    private TextView mLongitude;
     private FloatingActionButton mAdd;
 
     @Override
@@ -84,13 +100,17 @@ public class HomeActivity extends AppCompatActivity {
         new DownloadPhone().execute();
         new DownloadUsers().execute();
 
+        mName = (TextView) findViewById(R.id.home_name);
+        mLatitude = (TextView) findViewById(R.id.home_latitude);
+        mLongitude = (TextView) findViewById(R.id.home_longitude);
         mAdd = (FloatingActionButton) findViewById(R.id.home_add);
+
         mAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent addUserIntent = new Intent(HomeActivity.this, AddUserActivity.class);
                 addUserIntent.putExtra("username", getIntent().getStringExtra("username"));
-                startActivity(addUserIntent);
+                startActivityForResult(addUserIntent, REQUEST_ADD);
             }
         });
     }
@@ -120,6 +140,11 @@ public class HomeActivity extends AppCompatActivity {
                 Intent addPhoneIntent = new Intent(HomeActivity.this, AddPhoneActivity.class);
                 addPhoneIntent.putExtra("username", getIntent().getStringExtra("username"));
                 startActivityForResult(addPhoneIntent, REQUEST_PHONE);
+            } else {
+                mName.setText(mPhone.getName());
+                mLatitude.setText("Latitude: " + mPhone.getLatitude());
+                mLongitude.setText("Longitude: " + mPhone.getLongitude());
+                initLocation();
             }
             return null;
         }
@@ -127,6 +152,47 @@ public class HomeActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void result) {
             mDialog.dismiss();
+        }
+    }
+
+    private void initLocation() {
+        try {
+            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+            mFusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    if (location != null) {
+                        mLatitude.setText("Latitude: " + location.getLatitude());
+                        mLongitude.setText("Longitude: " + location.getLongitude());
+                        mLocation = location;
+                        new UpdatePhone().execute();
+                    }
+                }
+            });
+        } catch (SecurityException ex) {
+            ex.printStackTrace();
+        }
+
+    }
+
+    private class UpdatePhone extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            mPhone.setLatitude(mLocation.getLatitude());
+            mPhone.setLongitude(mLocation.getLongitude());
+            mMapper.save(mPhone);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
         }
     }
 
@@ -283,7 +349,7 @@ public class HomeActivity extends AppCompatActivity {
         public void bindUser(User user) {
             mUser = user;
             mImage.setImageBitmap(Bitmap.createScaledBitmap(
-                    mUser.getImage(),200, 200, false));
+                    mUser.getImage(),180, 240, false));
             mName.setText(mUser.getName());
         }
     }

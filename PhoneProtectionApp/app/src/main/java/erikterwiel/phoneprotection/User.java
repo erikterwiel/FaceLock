@@ -1,7 +1,6 @@
 package erikterwiel.phoneprotection;
 
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 
 public class User {
     private String mName;
