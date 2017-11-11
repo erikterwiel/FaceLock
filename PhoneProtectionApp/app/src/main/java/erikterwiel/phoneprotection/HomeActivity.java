@@ -1,6 +1,8 @@
 package erikterwiel.phoneprotection;
 
 import android.annotation.TargetApi;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +15,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.SystemClock;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +29,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -53,6 +57,8 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -62,6 +68,7 @@ public class HomeActivity extends AppCompatActivity {
     private static final String BUCKET_NAME = "phoneprotectionpictures";
     private static final int REQUEST_PHONE = 102;
     private static final int REQUEST_ADD = 103;
+    private static final int REQUEST_DETECTION = 1004;
 
     private TransferUtility mTransferUtility;
     private AmazonS3Client mS3Client;
@@ -76,10 +83,13 @@ public class HomeActivity extends AppCompatActivity {
     private RecyclerView mUsers;
     private UserAdapter mUserAdapter;
     private Location mLocation;
+    private Intent mDetectionIntent;
     private MenuItem mSettings;
     private TextView mName;
     private TextView mLatitude;
     private TextView mLongitude;
+    private Button mStart;
+    private Button mStop;
     private FloatingActionButton mAdd;
 
     @Override
@@ -88,6 +98,8 @@ public class HomeActivity extends AppCompatActivity {
         Log.i(TAG, "onCreate() called");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        mDetectionIntent = new Intent(this, DetectionService.class);
 
         mTransferUtility = getTransferUtility(this);
         CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
@@ -103,7 +115,23 @@ public class HomeActivity extends AppCompatActivity {
         mName = (TextView) findViewById(R.id.home_name);
         mLatitude = (TextView) findViewById(R.id.home_latitude);
         mLongitude = (TextView) findViewById(R.id.home_longitude);
+        mStart = (Button) findViewById(R.id.home_start);
+        mStop = (Button) findViewById(R.id.home_stop);
         mAdd = (FloatingActionButton) findViewById(R.id.home_add);
+
+        mStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startService(mDetectionIntent);
+            }
+        });
+
+        mStop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                stopService(mDetectionIntent);
+            }
+        });
 
         mAdd.setOnClickListener(new View.OnClickListener() {
             @Override
