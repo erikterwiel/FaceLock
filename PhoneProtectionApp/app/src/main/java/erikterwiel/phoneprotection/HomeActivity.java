@@ -122,6 +122,10 @@ public class HomeActivity extends AppCompatActivity {
         mStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                mDetectionIntent.putExtra("size", mUserList.size());
+                for (int i = 0; i < mUserList.size(); i++) {
+                    mDetectionIntent.putExtra("user" + i, mUserList.get(i).getFileName());
+                }
                 startService(mDetectionIntent);
             }
         });
