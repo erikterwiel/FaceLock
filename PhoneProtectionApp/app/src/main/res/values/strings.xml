@@ -5,4 +5,8 @@
     <string name="login_password">Password</string>
     <string name="login_login">Login</string>
     <string name="login_register">Register</string>
+    <string name="register_label">Register</string>
+    <string name="register_email">Email</string>
+    <string name="register_password">Password</string>
+    <string name="register_register">Register</string>
 </resources>
