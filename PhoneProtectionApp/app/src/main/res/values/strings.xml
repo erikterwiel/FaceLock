@@ -13,6 +13,8 @@
     <string name="home_label">Phone Protection</string>
     <string name="home_downloading">Downloading</string>
     <string name="home_wait">Please wait</string>
+    <string name="home_users">Users:</string>
+    <string name="home_phones">Phones:</string>
     <string name="home_start">Start Protection</string>
     <string name="home_stop">Stop Protection</string>
     <string name="home_settings">Settings</string>

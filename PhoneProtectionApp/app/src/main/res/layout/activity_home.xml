@@ -1,35 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="16dp">
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/home_users"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/home_phones"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-        <Button
-            android:id="@+id/home_start"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/home_start"/>
-        <Button
-            android:id="@+id/home_stop"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/home_stop"/>
-    </LinearLayout>
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp">
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/home_add"
         android:layout_width="wrap_content"
@@ -37,4 +12,42 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:src="@drawable/ic_add_white_48dp"/>
-</FrameLayout>
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/home_users"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/home_users"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/home_phones"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/home_phones"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <Button
+                android:id="@+id/home_start"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/home_start"/>
+            <Button
+                android:id="@+id/home_stop"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/home_stop"/>
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
+</android.support.design.widget.CoordinatorLayout>

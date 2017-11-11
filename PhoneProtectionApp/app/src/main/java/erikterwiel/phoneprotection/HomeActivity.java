@@ -3,6 +3,8 @@ package erikterwiel.phoneprotection;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
@@ -35,6 +37,7 @@ import com.amazonaws.services.s3.model.S3ObjectSummary;
 import org.w3c.dom.Text;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -69,6 +72,7 @@ public class HomeActivity extends AppCompatActivity {
                 getApplicationContext(),
                 POOL_ID_UNAUTH,
                 Regions.US_EAST_1);
+        AmazonDynamoDBClient
         new DownloadUsers().execute();
 
         mAdd = (FloatingActionButton) findViewById(R.id.home_add);
@@ -167,8 +171,10 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void displayList() {
-        for (int i = 0; i < mUserList.size(); i++)
-            mUserList.get(i).setImage(Drawable.createFromPath(mUserList.get(i).getFileName()));
+        for (int i = 0; i < mUserList.size(); i++) {
+            Bitmap bitmap = BitmapFactory.decodeFile(mUserList.get(i).getFileName());
+            mUserList.get(i).setImage(bitmap);
+        }
         mUsers = (RecyclerView) findViewById(R.id.home_users);
         mUsers.setLayoutManager(new LinearLayoutManager(this));
         mUserAdapter = new UserAdapter(mUserList);
@@ -233,7 +239,8 @@ public class HomeActivity extends AppCompatActivity {
 
         public void bindUser(User user) {
             mUser = user;
-            mImage.setImageDrawable(mUser.getImage());
+            mImage.setImageBitmap(Bitmap.createScaledBitmap(
+                    mUser.getImage(),200, 200, false));
             mName.setText(mUser.getName());
         }
     }

@@ -21,6 +21,7 @@
         android:hint="@string/login_password"
         android:inputType="textPassword"
         android:imeOptions="actionSend"
+        android:text="popcorn"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
     <Button
         android:id="@+id/login_login"

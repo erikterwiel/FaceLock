@@ -1,11 +1,12 @@
 package erikterwiel.phoneprotection;
 
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 
 public class User {
     private String mName;
     private String mFileName;
-    private Drawable mImage;
+    private Bitmap mImage;
 
     public String getName() {
         return mName;
@@ -23,11 +24,11 @@ public class User {
         mFileName = fileName;
     }
 
-    public Drawable getImage() {
+    public Bitmap getImage() {
         return mImage;
     }
 
-    public void setImage(Drawable image) {
+    public void setImage(Bitmap image) {
         mImage = image;
     }
 }
