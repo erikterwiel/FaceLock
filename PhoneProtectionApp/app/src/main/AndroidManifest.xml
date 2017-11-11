@@ -19,17 +19,17 @@
             android:label="@string/login_label">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".RegisterActivity"
-            android:label="@string/register_label">
-        </activity>
+            android:label="@string/register_label"></activity>
         <activity
             android:name=".HomeActivity"
-            android:label="@string/home_label">
-        </activity>
+            android:label="@string/home_label"></activity>
+        <activity android:name=".AddUserActivity"></activity>
     </application>
 
 </manifest>

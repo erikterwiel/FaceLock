@@ -10,4 +10,7 @@
     <string name="register_password">Password</string>
     <string name="register_register">Register</string>
     <string name="home_label">Phone Protection</string>
+    <string name="home_start">Start Protection</string>
+    <string name="home_stop">Stop Protection</string>
+    <string name="home_settings">Settings</string>
 </resources>
