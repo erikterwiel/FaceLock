@@ -25,38 +25,20 @@ public class RegisterActivity extends AppCompatActivity {
     private static final String CLIENT_SECRET = "ikcnfkqik9k6srh3ms6bt7vpbsgj55s0h0bfrh435bkh0topkl4";
 
     private CognitoUserPool mUserPool;
-    private SignUpHandler mSignupCallback;
     private EditText mEmail;
     private EditText mPassword;
     private Button mRegister;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.i(TAG, "onCreate() called");
 
+        Log.i(TAG, "onCreate() called");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
         ClientConfiguration clientConfiguration = new ClientConfiguration();
         mUserPool = new CognitoUserPool(
                 this, POOL_ID_AUTH, CLIENT_ID, CLIENT_SECRET, clientConfiguration);
-        mSignupCallback = new SignUpHandler() {
-            @Override
-            public void onSuccess(CognitoUser user, boolean signUpConfirmationState, CognitoUserCodeDeliveryDetails cognitoUserCodeDeliveryDetails) {
-                Toast.makeText(RegisterActivity.this,
-                        "Registration successful, please check email for verification link.",
-                        Toast.LENGTH_LONG).show();
-                finish();
-            }
-
-            @Override
-            public void onFailure(Exception exception) {
-                Toast.makeText(RegisterActivity.this,
-                        "Registration unsuccessful, please try again.",
-                        Toast.LENGTH_LONG).show();
-                exception.printStackTrace();
-            }
-        };
 
         mEmail = (EditText) findViewById(R.id.register_email);
         mPassword = (EditText) findViewById(R.id.register_password);
@@ -65,10 +47,27 @@ public class RegisterActivity extends AppCompatActivity {
         mRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                 SignUpHandler signupCallback = new SignUpHandler() {
+                    @Override
+                    public void onSuccess(CognitoUser user, boolean signUpConfirmationState, CognitoUserCodeDeliveryDetails cognitoUserCodeDeliveryDetails) {
+                        Toast.makeText(RegisterActivity.this,
+                                "Registration successful, please check email for verification link.",
+                                Toast.LENGTH_LONG).show();
+                        finish();
+                    }
+
+                    @Override
+                    public void onFailure(Exception exception) {
+                        Toast.makeText(RegisterActivity.this,
+                                "Registration unsuccessful, please try again.",
+                                Toast.LENGTH_LONG).show();
+                        exception.printStackTrace();
+                    }
+                };
                 CognitoUserAttributes userAttributes = new CognitoUserAttributes();
                 mUserPool.signUpInBackground(mEmail.getText().toString(),
                         mPassword.getText().toString(),
-                        userAttributes, null, mSignupCallback);
+                        userAttributes, null, signupCallback);
             }
         });
     }

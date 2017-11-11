@@ -9,4 +9,5 @@
     <string name="register_email">Email</string>
     <string name="register_password">Password</string>
     <string name="register_register">Register</string>
+    <string name="home_label">Phone Protection</string>
 </resources>
