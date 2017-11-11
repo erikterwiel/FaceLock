@@ -3,15 +3,21 @@ package erikterwiel.phoneprotection;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.amazonaws.auth.AWSCredentialsProvider;
@@ -25,6 +31,8 @@ import com.amazonaws.services.rekognition.model.DetectLabelsResult;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
+
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -42,6 +50,10 @@ public class HomeActivity extends AppCompatActivity {
     private AmazonS3Client mS3Client;
     private AWSCredentialsProvider mCredentialsProvider;
     private ArrayList<HashMap<String, Object>> mTransferRecordMaps = new ArrayList<>();
+    private ArrayList<User> mUserList = new ArrayList<>();
+    private int mCompletedDownloads;
+    private RecyclerView mUsers;
+    private UserAdapter mUserAdapter;
     private MenuItem mSettings;
     private FloatingActionButton mAdd;
 
@@ -94,8 +106,11 @@ public class HomeActivity extends AppCompatActivity {
             List<S3ObjectSummary> s3ObjList = objectListing.getObjectSummaries();
             for (S3ObjectSummary summary : s3ObjList) {
                 HashMap<String, Object> map = new HashMap<String, Object>();
-                map.put("key", summary.getKey());
-                mTransferRecordMaps.add(map);
+                String key = summary.getKey();
+                if (key.contains(getIntent().getStringExtra("username"))) {
+                    map.put("key", key);
+                    mTransferRecordMaps.add(map);
+                }
             }
             for (int i = 0; i < mTransferRecordMaps.size(); i++) {
                 beginDownload((String) mTransferRecordMaps.get(i).get("key"));
@@ -115,6 +130,49 @@ public class HomeActivity extends AppCompatActivity {
         File file = new File(folder, key);
         TransferObserver observer = mTransferUtility.download(BUCKET_NAME, key, file);
         observer.setTransferListener(new DownloadListener());
+
+        User user = new User();
+        String filePath = file.getAbsolutePath();
+        String[] filePathSplit = filePath.split("/");
+        String nameJpg = filePathSplit[filePathSplit.length - 1];
+        String name = nameJpg.substring(0, nameJpg.length() - 4);
+        user.setFileName(filePath);
+        user.setName(name);
+        mUserList.add(user);
+        Log.i(TAG, user.getFileName());
+        Log.i(TAG, user.getName());
+    }
+
+    private class DownloadListener implements TransferListener {
+        @Override
+        public void onStateChanged(int id, TransferState state) {
+            Log.i(TAG, state + "");
+            if (state == TransferState.COMPLETED) {
+                mCompletedDownloads += 1;
+                if (mCompletedDownloads == mUserList.size()) displayList();
+            }
+        }
+        @Override
+        public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
+            if (bytesTotal != 0) {
+                int percentage = (int) (bytesCurrent / bytesTotal * 100);
+                Log.i(TAG, Integer.toString(percentage) + "% downloaded");
+            }
+        }
+        @Override
+        public void onError(int id, Exception ex) {
+            ex.printStackTrace();
+            Log.i(TAG, "Error detected");
+        }
+    }
+
+    public void displayList() {
+        for (int i = 0; i < mUserList.size(); i++)
+            mUserList.get(i).setImage(Drawable.createFromPath(mUserList.get(i).getFileName()));
+        mUsers = (RecyclerView) findViewById(R.id.home_users);
+        mUsers.setLayoutManager(new LinearLayoutManager(this));
+        mUserAdapter = new UserAdapter(mUserList);
+        mUsers.setAdapter(mUserAdapter);
     }
 
     public TransferUtility getTransferUtility(Context context) {
@@ -136,22 +194,47 @@ public class HomeActivity extends AppCompatActivity {
         return mCredentialsProvider;
     }
 
-    private class DownloadListener implements TransferListener {
-        @Override
-        public void onStateChanged(int id, TransferState state) {
-            Log.i(TAG, state + "");
+    private class UserAdapter extends RecyclerView.Adapter<UserHolder> {
+        private ArrayList<User> userList;
+
+        public UserAdapter(ArrayList<User> incomingList) {
+            userList = incomingList;
         }
+
         @Override
-        public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
-            if (bytesTotal != 0) {
-                int percentage = (int) (bytesCurrent / bytesTotal * 100);
-                Log.i(TAG, Integer.toString(percentage) + "% downloaded");
-            }
+        public UserHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            LayoutInflater layoutInflater = LayoutInflater.from(HomeActivity.this);
+            View view = layoutInflater.inflate(R.layout.item_user, parent, false);
+            return new HomeActivity.UserHolder(view);
         }
+
         @Override
-        public void onError(int id, Exception ex) {
-            ex.printStackTrace();
-            Log.i(TAG, "Error detected");
+        public void onBindViewHolder(UserHolder holder, int position) {
+            User user = userList.get(position);
+            holder.bindUser(user);
+        }
+
+        @Override
+        public int getItemCount() {
+            return userList.size();
+        }
+    }
+
+    private class UserHolder extends RecyclerView.ViewHolder {
+        private User mUser;
+        private ImageView mImage;
+        private TextView mName;
+
+        public UserHolder(View itemView) {
+            super(itemView);
+            mImage = (ImageView) itemView.findViewById(R.id.user_image);
+            mName = (TextView) itemView.findViewById(R.id.user_name);
+        }
+
+        public void bindUser(User user) {
+            mUser = user;
+            mImage.setImageDrawable(mUser.getImage());
+            mName.setText(mUser.getName());
         }
     }
 
