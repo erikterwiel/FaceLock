@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Phone Protection</string>
+    <string name="login_label">Sign In</string>
+    <string name="login_email">Email</string>
+    <string name="login_password">Password</string>
+    <string name="login_login">Login</string>
+    <string name="login_register">Register</string>
 </resources>
