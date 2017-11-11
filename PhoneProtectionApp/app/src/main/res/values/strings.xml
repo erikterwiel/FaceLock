@@ -10,6 +10,11 @@
     <string name="register_email">Email</string>
     <string name="register_password">Password</string>
     <string name="register_register">Register</string>
+    <string name="phone_label">Add Phone</string>
+    <string name="phone_uploading">Uploading</string>
+    <string name="phone_wait">Please wait</string>
+    <string name="phone_name">Phone name</string>
+    <string name="phone_add_phone">Add Phone</string>
     <string name="home_label">Phone Protection</string>
     <string name="home_downloading">Downloading</string>
     <string name="home_wait">Please wait</string>

@@ -24,11 +24,13 @@ import android.widget.TextView;
 
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.regions.Regions;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.rekognition.model.DetectLabelsResult;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectListing;
@@ -48,10 +50,14 @@ public class HomeActivity extends AppCompatActivity {
     private static final String POOL_ID_UNAUTH = "us-east-1:d2040261-6a0f-4cba-af96-8ead1b66ec38";
     private static final String POOL_REGION = "us-east-1";
     private static final String BUCKET_NAME = "phoneprotectionpictures";
+    private static final int REQUEST_PHONE = 102;
 
     private TransferUtility mTransferUtility;
     private AmazonS3Client mS3Client;
     private AWSCredentialsProvider mCredentialsProvider;
+    private AmazonDynamoDBClient mDDBClient;
+    private DynamoDBMapper mMapper;
+    private Username mPhone;
     private ArrayList<HashMap<String, Object>> mTransferRecordMaps = new ArrayList<>();
     private ArrayList<User> mUserList = new ArrayList<>();
     private int mCompletedDownloads;
@@ -72,7 +78,10 @@ public class HomeActivity extends AppCompatActivity {
                 getApplicationContext(),
                 POOL_ID_UNAUTH,
                 Regions.US_EAST_1);
-        AmazonDynamoDBClient
+        mDDBClient = new AmazonDynamoDBClient(credentialsProvider);
+        mMapper = new DynamoDBMapper(mDDBClient);
+
+        new DownloadPhone().execute();
         new DownloadUsers().execute();
 
         mAdd = (FloatingActionButton) findViewById(R.id.home_add);
@@ -92,6 +101,40 @@ public class HomeActivity extends AppCompatActivity {
         menuInflater.inflate(R.menu.home_settings, menu);
         mSettings = menu.findItem(R.id.home_settings);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    private class DownloadPhone extends AsyncTask<Void, Void, Void> {
+        private ProgressDialog mDialog;
+
+        @Override
+        protected void onPreExecute() {
+            mDialog = ProgressDialog.show(HomeActivity.this,
+                    getString(R.string.home_downloading),
+                    getString(R.string.home_wait));
+        }
+
+        @Override
+        protected Void doInBackground(Void... inputs) {
+            mPhone = mMapper.load(Username.class, getIntent().getStringExtra("username"));
+            if (mPhone == null) {
+                Intent addPhoneIntent = new Intent(HomeActivity.this, AddPhoneActivity.class);
+                addPhoneIntent.putExtra("username", getIntent().getStringExtra("username"));
+                startActivityForResult(addPhoneIntent, REQUEST_PHONE);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            mDialog.dismiss();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Intent restartIntent = getIntent();
+        finish();
+        startActivity(restartIntent);
     }
 
     private class DownloadUsers extends AsyncTask<Void, Void, Void> {
