@@ -1,12 +1,19 @@
 package erikterwiel.phoneprotection;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amazonaws.ClientConfiguration;
@@ -30,6 +37,7 @@ public class LoginActivity extends AppCompatActivity {
     private static final String POOL_ID_AUTH = "us-east-1_quEHfVOLz";
     private static final String CLIENT_ID = "3f9c5tmbc37qkos75d69nfmbsm";
     private static final String CLIENT_SECRET = "ikcnfkqik9k6srh3ms6bt7vpbsgj55s0h0bfrh435bkh0topkl4";
+    private static final int REQUEST_PERMISSION = 100;
 
     private CognitoUserPool mUserPool;
     private CognitoUser mCognitoUser;
@@ -37,6 +45,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText mPassword;
     private Button mLogin;
     private Button mRegister;
+    private SharedPreferences mMemory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +53,13 @@ public class LoginActivity extends AppCompatActivity {
         Log.i(TAG, "onCreate() called");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        ActivityCompat.requestPermissions(
+                this,
+                new String[] {
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                REQUEST_PERMISSION);
 
         ClientConfiguration clientConfiguration = new ClientConfiguration();
         mUserPool = new CognitoUserPool(
@@ -55,9 +71,28 @@ public class LoginActivity extends AppCompatActivity {
         mLogin = (Button) findViewById(R.id.login_login);
         mRegister = (Button) findViewById(R.id.login_register);
 
+        mMemory = getSharedPreferences("memory", Context.MODE_PRIVATE);
+        if (mMemory.contains("email")) {
+            mEmail.setText(mMemory.getString("email", null));
+            mPassword.requestFocus();
+        }
+
+        mPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionID, KeyEvent keyEvent) {
+                if (actionID == EditorInfo.IME_ACTION_SEND) {
+                    Log.i(TAG, "Attempting to perform a click");
+                    mLogin.performClick();
+                    return true;
+                }
+                return false;
+            }
+        });
+
         mLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.i(TAG, "onClick() called");
                 AuthenticationHandler authenticationHandler = new AuthenticationHandler() {
                     @Override
                     public void onSuccess(CognitoUserSession userSession, CognitoDevice newDevice) {
@@ -98,6 +133,7 @@ public class LoginActivity extends AppCompatActivity {
                 mCognitoUser.getSessionInBackground(authenticationHandler);
             }
         });
+
         mRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -105,5 +141,14 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(registerIntent);
             }
         });
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.i(TAG, "onStop() called");
+        SharedPreferences.Editor memoryEditor = mMemory.edit();
+        memoryEditor.putString("email", mEmail.getText().toString());
+        memoryEditor.apply();
     }
 }

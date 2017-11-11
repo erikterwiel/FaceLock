@@ -1,8 +1,13 @@
 package erikterwiel.phoneprotection;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,6 +30,7 @@ public class RegisterActivity extends AppCompatActivity {
     private static final String CLIENT_SECRET = "ikcnfkqik9k6srh3ms6bt7vpbsgj55s0h0bfrh435bkh0topkl4";
 
     private CognitoUserPool mUserPool;
+    private MenuItem mDone;
     private EditText mEmail;
     private EditText mPassword;
     private Button mRegister;
@@ -70,5 +76,20 @@ public class RegisterActivity extends AppCompatActivity {
                         userAttributes, null, signupCallback);
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.register_done, menu);
+        mDone = menu.findItem(R.id.register_done);
+        mDone.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                finish();
+                return false;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
     }
 }

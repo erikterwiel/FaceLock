@@ -14,6 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity
             android:name=".LoginActivity"
             android:label="@string/login_label">
@@ -23,13 +24,35 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".RegisterActivity"
-            android:label="@string/register_label"></activity>
+            android:label="@string/register_label">
+        </activity>
+
         <activity
             android:name=".HomeActivity"
-            android:label="@string/home_label"></activity>
-        <activity android:name=".AddUserActivity"></activity>
+            android:label="@string/home_label">
+        </activity>
+
+        <activity
+            android:name=".AddUserActivity"
+            android:label="@string/add_label">
+        </activity>
+
+        <service
+            android:name="com.amazonaws.mobileconnectors.s3.transferutility.TransferService"
+            android:enabled="true" />
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="erikterwiel.phoneprotectionapp.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>
