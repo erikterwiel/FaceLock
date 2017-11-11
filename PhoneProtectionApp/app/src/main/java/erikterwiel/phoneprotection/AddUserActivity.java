@@ -78,7 +78,7 @@ public class AddUserActivity extends AppCompatActivity {
     }
 
     private File getFile() {
-        File folder = new File("sdcard/Pictures/PhoneProtection");
+        File folder = new File("sdcard/Pictures/PhoneProtection/Output");
         if (!folder.exists()) folder.mkdir();
         File image = new File(
                 folder, mName.getText() + ".jpg");
