@@ -16,7 +16,9 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.SystemClock;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -31,7 +33,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
@@ -79,11 +83,13 @@ public class HomeActivity extends AppCompatActivity {
     private ArrayList<HashMap<String, Object>> mTransferRecordMaps = new ArrayList<>();
     private ArrayList<User> mUserList = new ArrayList<>();
     private int mCompletedDownloads;
+    private CoordinatorLayout mCoordinator;
     private RecyclerView mUsers;
     private UserAdapter mUserAdapter;
     private Location mLocation;
     private Intent mDetectionIntent;
     private MenuItem mSettings;
+    private LinearLayout mLoading;
     private TextView mName;
     private TextView mLatitude;
     private TextView mLongitude;
@@ -111,6 +117,8 @@ public class HomeActivity extends AppCompatActivity {
         new DownloadPhone().execute();
         new DownloadUsers().execute();
 
+        mCoordinator = (CoordinatorLayout) findViewById(R.id.home_coordinator);
+        mLoading = (LinearLayout) findViewById(R.id.home_loading_users);
         mName = (TextView) findViewById(R.id.home_name);
         mLatitude = (TextView) findViewById(R.id.home_latitude);
         mLongitude = (TextView) findViewById(R.id.home_longitude);
@@ -126,6 +134,7 @@ public class HomeActivity extends AppCompatActivity {
                     mDetectionIntent.putExtra("user" + i, mUserList.get(i).getFileName());
                 }
                 mDetectionIntent.putExtra("username", getIntent().getStringExtra("username"));
+                Snackbar.make(mCoordinator, "Protection enabled.", Snackbar.LENGTH_LONG).show();
                 Log.i(TAG, "Passing " + getIntent().getStringExtra("username") + " to DetectionService");
                 startService(mDetectionIntent);
             }
@@ -134,6 +143,7 @@ public class HomeActivity extends AppCompatActivity {
         mStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Snackbar.make(mCoordinator, "Protection disabled.", Snackbar.LENGTH_LONG).show();
                 stopService(mDetectionIntent);
             }
         });
@@ -318,6 +328,11 @@ public class HomeActivity extends AppCompatActivity {
             Bitmap bitmap = BitmapFactory.decodeFile(mUserList.get(i).getFileName());
             mUserList.get(i).setImage(bitmap);
         }
+        ViewGroup.LayoutParams params = mLoading.getLayoutParams();
+        params.width = 0;
+        params.height = 0;
+        mLoading.setVisibility(View.INVISIBLE);
+        mLoading.setLayoutParams(params);
         mUsers = (RecyclerView) findViewById(R.id.home_users);
         mUsers.setLayoutManager(new LinearLayoutManager(this));
         mUserAdapter = new UserAdapter(mUserList);

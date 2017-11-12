@@ -96,7 +96,7 @@ public class TrackerService extends Service {
                 mRunCounter += 1;
                 if (mRunCounter == 20) onDestroy();
             }
-        }, 0, 30000);
+        }, 0, 15000);
         return START_STICKY;
     }
 

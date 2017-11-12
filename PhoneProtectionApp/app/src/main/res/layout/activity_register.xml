@@ -11,6 +11,8 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:hint="@string/register_email"
+        android:textColor="@android:color/black"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:inputType="textEmailAddress"/>
     <EditText
         android:id="@+id/register_password"
@@ -18,10 +20,14 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:hint="@string/register_password"
+        android:textColor="@android:color/black"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:inputType="textPassword"/>
     <Button
         android:id="@+id/register_register"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:textColor="@android:color/black"
         android:text="@string/register_register"/>
 </LinearLayout>

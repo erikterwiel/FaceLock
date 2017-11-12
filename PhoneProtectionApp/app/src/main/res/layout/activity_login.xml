@@ -12,6 +12,7 @@
         android:layout_marginBottom="8dp"
         android:hint="@string/login_email"
         android:inputType="textEmailAddress"
+        android:textColor="@android:color/black"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
     <EditText
         android:id="@+id/login_password"
@@ -21,16 +22,29 @@
         android:hint="@string/login_password"
         android:inputType="textPassword"
         android:imeOptions="actionSend"
+        android:textColor="@android:color/black"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
-    <Button
-        android:id="@+id/login_login"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:text="@string/login_login"/>
-    <Button
-        android:id="@+id/login_register"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/login_register"/>
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/login_login"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:background="@android:color/white"
+            android:textColor="@android:color/black"
+            android:text="@string/login_login"/>
+        <Button
+            android:id="@+id/login_register"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:background="@android:color/white"
+            android:textColor="@android:color/black"
+            android:text="@string/login_register"/>
+    </LinearLayout>
 </LinearLayout>
