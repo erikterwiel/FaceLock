@@ -68,7 +68,6 @@ public class HomeActivity extends AppCompatActivity {
     private static final String BUCKET_NAME = "phoneprotectionpictures";
     private static final int REQUEST_PHONE = 102;
     private static final int REQUEST_ADD = 103;
-    private static final int REQUEST_DETECTION = 1004;
 
     private TransferUtility mTransferUtility;
     private AmazonS3Client mS3Client;
@@ -126,6 +125,7 @@ public class HomeActivity extends AppCompatActivity {
                 for (int i = 0; i < mUserList.size(); i++) {
                     mDetectionIntent.putExtra("user" + i, mUserList.get(i).getFileName());
                 }
+                mDetectionIntent.putExtra("username", getIntent().getStringExtra("username"));
                 startService(mDetectionIntent);
             }
         });
@@ -252,7 +252,8 @@ public class HomeActivity extends AppCompatActivity {
             for (S3ObjectSummary summary : s3ObjList) {
                 HashMap<String, Object> map = new HashMap<String, Object>();
                 String key = summary.getKey();
-                if (key.contains(getIntent().getStringExtra("username"))) {
+                if (key.contains(getIntent().getStringExtra("username")) &&
+                        !key.contains("Intruder")) {
                     map.put("key", key);
                     mTransferRecordMaps.add(map);
                 }

@@ -1,6 +1,8 @@
 package erikterwiel.phoneprotection;
 
 import android.Manifest;
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -38,6 +40,7 @@ public class LoginActivity extends AppCompatActivity {
     private static final String CLIENT_ID = "3f9c5tmbc37qkos75d69nfmbsm";
     private static final String CLIENT_SECRET = "ikcnfkqik9k6srh3ms6bt7vpbsgj55s0h0bfrh435bkh0topkl4";
     private static final int REQUEST_PERMISSION = 100;
+    private static final int REQUEST_ADMIN = 105;
 
     private CognitoUserPool mUserPool;
     private CognitoUser mCognitoUser;
@@ -63,6 +66,12 @@ public class LoginActivity extends AppCompatActivity {
                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
                         Manifest.permission.CAMERA},
                 REQUEST_PERMISSION);
+
+        ComponentName compName = new ComponentName(this, MyAdminReceiver.class);
+        Intent adminIntent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+        adminIntent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, compName);
+        adminIntent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "To Lock Screen");
+        startActivityForResult(adminIntent, REQUEST_ADMIN);
 
         ClientConfiguration clientConfiguration = new ClientConfiguration();
         mUserPool = new CognitoUserPool(
