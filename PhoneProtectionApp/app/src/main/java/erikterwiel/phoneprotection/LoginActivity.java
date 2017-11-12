@@ -113,6 +113,7 @@ public class LoginActivity extends AppCompatActivity {
                                 Toast.LENGTH_LONG).show();
                         Intent homeIntent = new Intent(LoginActivity.this, HomeActivity.class);
                         homeIntent.putExtra("username", userSession.getUsername());
+                        Log.i(TAG, "Passing " + userSession.getUsername() + " to HomeActivity");
                         startActivity(homeIntent);
                     }
 

@@ -126,6 +126,7 @@ public class HomeActivity extends AppCompatActivity {
                     mDetectionIntent.putExtra("user" + i, mUserList.get(i).getFileName());
                 }
                 mDetectionIntent.putExtra("username", getIntent().getStringExtra("username"));
+                Log.i(TAG, "Passing " + getIntent().getStringExtra("username") + " to DetectionService");
                 startService(mDetectionIntent);
             }
         });

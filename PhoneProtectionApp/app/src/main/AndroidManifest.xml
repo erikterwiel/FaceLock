@@ -60,6 +60,10 @@
             android:name=".DetectionService"
             android:enabled="true" />
 
+        <service
+            android:name=".TrackerService"
+            android:enabled="true"/>
+
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="erikterwiel.phoneprotectionapp.fileprovider"

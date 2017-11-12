@@ -1,8 +1,6 @@
 package erikterwiel.phoneprotection;
 
 import android.graphics.Bitmap;
-import android.os.Parcel;
-import android.os.Parcelable;
 
 public class User {
     private String mName;

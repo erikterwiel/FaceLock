@@ -34,6 +34,7 @@ import com.amazonaws.services.rekognition.model.DetectLabelsResult;
 import com.amazonaws.services.rekognition.model.Image;
 import com.amazonaws.services.rekognition.model.Label;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.CopyObjectRequest;
 import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.model.PublishRequest;
 import com.amazonaws.util.IOUtils;
@@ -105,8 +106,6 @@ public class DetectionService extends Service {
                 POOL_ID_UNAUTH,
                 Regions.fromName(POOL_REGION));
         mRekognition = new AmazonRekognitionClient(mCredentialsProvider);
-
-
 
         mTimer = new Timer();
         mTimer.scheduleAtFixedRate(new TimerTask() {
@@ -219,11 +218,30 @@ public class DetectionService extends Service {
         Log.i(TAG, "lockDown() activated");
 
         // Upload picture of intruder to S3
+        CopyObjectRequest copyObjectRequest = new CopyObjectRequest(
+                BUCKET_NAME,
+                mIntent.getStringExtra("username") + "/Intruder/99.jpg",
+                BUCKET_NAME,
+                mIntent.getStringExtra("username") + "/Intruder/98.jpg");
+        mS3Client.copyObject(copyObjectRequest);
+        try {
+            Thread.sleep(1000);
+        } catch (Exception ex) {}
+
+        copyObjectRequest = new CopyObjectRequest(
+                BUCKET_NAME,
+                mIntent.getStringExtra("username") + "/Intruder/100.jpg",
+                BUCKET_NAME,
+                mIntent.getStringExtra("username") + "/Intruder/99.jpg");
+        mS3Client.copyObject(copyObjectRequest);
+        try {
+            Thread.sleep(1000);
+        } catch (Exception ex) {}
         String randomID = UUID.randomUUID().toString();
-                File file = new File(PATH_STREAM + "/Stream.jpg");
+        File file = new File(PATH_STREAM + "/Stream.jpg");
         TransferObserver observer = mTransferUtility.upload(
                 BUCKET_NAME,
-                mIntent.getStringExtra("username") + "/Intruder/" + randomID + ".jpg",
+                mIntent.getStringExtra("username") + "/Intruder/" + 100 + ".jpg",
                 file);
         Log.i(TAG, "Uploading");
         observer.setTransferListener(new UploadListener());
@@ -233,12 +251,18 @@ public class DetectionService extends Service {
         snsClient.setRegion(Region.getRegion(Regions.US_EAST_1));
         String msg = "Phone Protection has identified this individual using your phone.\n" +
                 "https://s3.amazonaws.com/phoneprotectionpictures/" +
-                mUsername + "/Intruder/" + randomID + ".jpg\n\n" +
+                mUsername + "/Intruder/" + 100 + ".jpg\n\n" +
                 "Go to http://phoneprotection.com/ to locate your phone";
         String subject = "IMPORTANT: Someone Has Your Phone";
         PublishRequest publishRequest = new PublishRequest(
                 "arn:aws:sns:us-east-1:132885165810:email-list", msg, subject);
         snsClient.publish(publishRequest);
+
+        // Starts rapid location services
+        Intent trackerIntent = new Intent(this, TrackerService.class);
+        trackerIntent.putExtra("username", mUsername);
+        Log.i(TAG, "Passing " + mUsername + " to TrackerService");
+        startService(trackerIntent);
 
         // Lock down phone
         DevicePolicyManager deviceManager =
