@@ -1,3 +1,32 @@
 <resources>
-    <string name="app_name">Phone Protection</string>
+    <string name="app_name">Swiper No Swiping</string>
+    <string name="login_label">Swiper No Swiping</string>
+    <string name="login_email">Email</string>
+    <string name="login_password">Password</string>
+    <string name="login_login">Login</string>
+    <string name="login_register">Register</string>
+    <string name="register_label">Register</string>
+    <string name="register_done">Done</string>
+    <string name="register_email">Email</string>
+    <string name="register_password">Password</string>
+    <string name="register_register">Register</string>
+    <string name="phone_label">Add Phone</string>
+    <string name="phone_uploading">Uploading</string>
+    <string name="phone_wait">Please wait</string>
+    <string name="phone_name">Phone name</string>
+    <string name="phone_add_phone">Add Phone</string>
+    <string name="home_label">Swiper No Swiping</string>
+    <string name="home_downloading">Downloading</string>
+    <string name="home_wait">Please wait</string>
+    <string name="home_loading_users">Loading users please wait</string>
+    <string name="home_users">Users:</string>
+    <string name="home_phones">Phones:</string>
+    <string name="home_start">Enable Protection</string>
+    <string name="home_stop">Disable Protection</string>
+    <string name="home_settings">Settings</string>
+    <string name="add_label">Add User</string>
+    <string name="add_done">Done</string>
+    <string name="add_name">User name</string>
+    <string name="add_add_image">Add Image</string>
+    <string name="add_replace_image">Replace Image</string>
 </resources>
