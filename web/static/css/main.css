@@ -5,11 +5,17 @@
     background-size: cover;
 }
 
+img.first{
+    align-content: left;
+    padding-top:10%;;
+    margin-bottom: 10%;
+}
+
 h1{
     font-size: 5em;
     color: white;
     text-align: center;
-    padding-top: 7%;
+    padding-top: 15%;
     padding-bottom:4%;
     margin: 0;
 }
