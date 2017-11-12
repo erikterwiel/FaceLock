@@ -1,6 +1,7 @@
 package erikterwiel.phoneprotection;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
@@ -12,6 +13,8 @@ import android.graphics.SurfaceTexture;
 import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
 import android.os.IBinder;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -245,6 +248,10 @@ public class DetectionService extends Service {
                 file);
         Log.i(TAG, "Uploading");
         observer.setTransferListener(new UploadListener());
+
+        // Vibrates phone
+        Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+        vibrator.vibrate(VibrationEffect.createOneShot(1000,255));
 
         // Email owner of phone
         AmazonSNSClient snsClient = new AmazonSNSClient(mCredentialsProvider);
