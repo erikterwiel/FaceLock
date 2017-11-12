@@ -1,0 +1,54 @@
+h1{
+    font-size: 5em;
+    opacity:0.3
+    background-color: lightgray;
+    text-align: center;
+}
+.first{
+    width:100%;
+    height:100%;
+    padding-top: 20%;
+    background: url(background.jpeg);
+    opacity:70%;
+}
+.options{
+    display:block;
+    padding: 2%;
+    text-align: center;
+    border-radius:5%;
+    font-size: 2em;
+}
+
+a{
+    display:inline-block;
+    margin-left: 5%;
+    margin-right: 5%;
+    padding:5%;
+    background-color:bisque;
+    opacity: 0.3;
+    color:white;
+    font-size: 1.5em;
+    text-decoration: none;
+}
+
+p{
+    
+}
+
+.myMap{
+    
+}
+body{
+    background-color:lightgray;
+    font-family: sans-serif
+}
+form{
+    text-align: center;
+    font-size: 2em;
+    margin-top: 25%;
+}
+input{
+    margin-bottom:5%;
+    display:inline-block;
+    font-size:1em;
+}

@@ -1,0 +1,136 @@
+.first{
+    background-image: url(http://freebigpictures.com/wp-content/uploads/2009/09/coniferous-forest.jpg);
+    background-repeat: no-repeat;
+    background-position:center center;
+    background-size: cover;
+}
+
+h1{
+    font-size: 5em;
+    color: white;
+    text-align: center;
+    padding-top: 7%;
+    padding-bottom:4%;
+    margin: 0;
+}
+
+h1.inside{
+    padding-top:10%;
+    padding-bottom:10%;
+}
+.inside{
+    box-sizing: border-box;
+    width:100%;
+    height:100%;
+    padding-top: 17%;
+    
+    opacity:60%;
+}
+.options{
+    display:block;
+    padding: 1%;
+    text-align: center;
+    font-size: 1.2em;
+}
+
+.options > a{
+    border-style: none;
+    display:inline-block;
+    margin-left: 5%;
+    margin-right: 5%;
+    padding:4%;
+    background-color:rgba(255,235,196,0.45);
+    border-radius:9%;
+    
+    color:white;
+    font-size: 1.5em;
+    text-decoration: none;
+}
+
+#phone > h1{
+    text-align: left;
+    padding-left:3%; 
+}
+
+#phone{
+    display:block;
+    background-image: url(https://i0.wp.com/picjumbo.com/wp-content/uploads/DSC02176.jpg?w=2210&quality=50);
+    background-repeat: no-repeat;
+    background-position:center center;
+    background-size: cover;
+    opacity:70%;
+    margin:0px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+#printoutPanel{
+    border-style: dashed;
+    float:left;
+    padding-left:1.5%;
+    padding-right:1%;
+    padding-top:4%;
+    padding-bottom: 15%;
+    box-sizing: border-box;
+    max-width: inherit;
+    margin-left:3%;
+    font-size: 2em;
+    margin-top:10%;
+    color: black;
+}
+
+
+#myMap{
+    border-radius:5%;
+    margin-bottom: 2%;
+    margin-top: 2%;
+    float:right;
+    margin-right: 3%;
+    opacity:90%;
+}
+
+#person{
+    margin-top: 0px;
+    margin: 0px !important;
+    background-image: url(https://static.pexels.com/photos/18855/pexels-photo.jpg);
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    opacity 70%;
+    display:block;
+    align-content:center;
+    padding-left: 1%;
+    padding-right:1.5%;
+}
+#person > h1{
+    text-align: right;
+    padding-right: 4%;
+    padding-top: 5%;
+}
+#person > img{
+    box-sizing: border-box;
+    margin-top: 5%;
+    padding:2%;
+    color:black;
+    border-style: dashed;
+    transform: rotate(90deg);
+    width: 33%;
+    height:auto;
+    
+    
+}
+
+
+body{
+    font-family: sans-serif
+}
+form{
+    text-align: center;
+    font-size: 2em;
+    margin-bottom: 15%;
+}
+input{
+    margin-bottom:5%;
+    display:inline-block;
+    font-size:1em;
+}
+        

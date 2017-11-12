@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link href="/static/main.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+        <input type="text" id="username" placeholder="Username"><br/>
+        <input type="password" id = "password"placeholder="Password"><br/>
+        <input type="button" value="Log in" onClick="clicked()">
+        <script type = "text/Javascript" src = "main.js">
+            function clicked(){
+                var user = document.getElementById('username');
+                var pass = document.getElementById('password');
+                
+                var coruser = "test";
+                var corpass = "123";
+                if(user.value == coruser &&pass.value = corpass){
+                    windows.location=href="/index";
+                }
+            }
+        </script>
+    </body>
+</html>
+
+<script type="text/javascript" style="maxwidth:50%; maxheight:70%">
+                var Image = new Array("/static/img/0.jpg","/static/img/1.jpg","/static/img/2.jpeg");
+                var Image_Num = 0;
+                var Image_Length = Image.length-1;
+                function change_image(num){
+                    Image_Num += num;
+                    if(Image_Num > Image_Length)Image_Num = 0;
+                    if(Image_Num <0)Image_Num = Image_Length;
+                    document.slideshow.src=Image[Image_Num];
+                    return false;
+                }
+            
+            </script>
+                
+            <img src="https://s3.amazonaws.com/phoneprotectionpictures/cefd63b1-d378-4141-b986-31ba2c058a21/Intruder/df49ac41-649d-4578-8085-448694aaf4d6.jpg", name="slideshow">
+            <table>
+            <tr>
+                <th float:left><a href="javascript:change_image(-1)">Previous</a></th>
+                <th float:right><a href="javascript:change_image(1)">Next</a></th>
+            </tr>
+            </table>
