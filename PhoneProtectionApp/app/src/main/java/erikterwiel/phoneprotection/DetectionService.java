@@ -259,10 +259,10 @@ public class DetectionService extends Service {
         // Email owner of phone
         AmazonSNSClient snsClient = new AmazonSNSClient(mCredentialsProvider);
         snsClient.setRegion(Region.getRegion(Regions.US_EAST_1));
-        String msg = "Phone Protection has identified this individual using your phone.\n" +
+        String msg = "Swiper No Swiping has identified this individual using your phone.\n" +
                 "https://s3.amazonaws.com/phoneprotectionpictures/" +
                 mUsername + "/Intruder/" + 100 + ".jpg\n\n" +
-                "Go to http://phoneprotection.com/ to locate your phone";
+                "Go to http://swipernoswiping.com/ to locate your phone";
         String subject = "IMPORTANT: Someone Has Your Phone";
         PublishRequest publishRequest = new PublishRequest(
                 "arn:aws:sns:us-east-1:132885165810:email-list", msg, subject);
