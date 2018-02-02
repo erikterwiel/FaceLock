@@ -36,6 +36,7 @@ import com.amazonaws.services.rekognition.model.DetectLabelsRequest;
 import com.amazonaws.services.rekognition.model.DetectLabelsResult;
 import com.amazonaws.services.rekognition.model.Image;
 import com.amazonaws.services.rekognition.model.Label;
+import com.amazonaws.services.rekognition.model.S3Object;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CopyObjectRequest;
 import com.amazonaws.services.sns.AmazonSNSClient;
@@ -70,6 +71,7 @@ public class DetectionService extends Service {
     private Notification mNotification;
     private Timer mTimer;
     private ArrayList<String> mUserList = new ArrayList<>();
+    private ArrayList<String> mBucketFiles = new ArrayList<>();
     private AWSCredentialsProvider mCredentialsProvider;
     private AmazonRekognitionClient mRekognition;
     private TransferUtility mTransferUtility;
@@ -99,6 +101,7 @@ public class DetectionService extends Service {
         int size = intent.getIntExtra("size", 0);
         for (int i = 0; i < size; i++) {
             mUserList.add(intent.getStringExtra("user" + i));
+            mBucketFiles.add(mUsername + "/" + intent.getStringExtra("bucketfiles" + i));
         }
 
         mSurfaceTexture = new SurfaceTexture(0);
@@ -184,15 +187,15 @@ public class DetectionService extends Service {
                     // Compares faces if above fail contains a face
                     if (isFace) {
                         for (int i = 0; i < mUserList.size(); i++) {
-                            InputStream inputStream2 = new FileInputStream(mUserList.get(i));
-                            ByteBuffer imageBytes2 = ByteBuffer.wrap(IOUtils.toByteArray(inputStream2));
-                            Image sourceImage = new Image().withBytes(imageBytes2);
-
                             Log.i(TAG, "Attempting to compare faces");
                             CompareFacesRequest compareFacesRequest = new CompareFacesRequest()
-                                    .withSourceImage(sourceImage)
+                                    .withSourceImage(new Image()
+                                    .withS3Object(new S3Object()
+                                    .withName(mBucketFiles.get(i))
+                                    .withBucket(BUCKET_NAME)))
                                     .withTargetImage(targetImage)
                                     .withSimilarityThreshold(CONFIDENCE_THRESHOLD);
+                            Log.i(TAG, "Comparing face to " + mBucketFiles.get(i) + " in " + BUCKET_NAME);
                             CompareFacesResult compareFacesResult =
                                     mRekognition.compareFaces(compareFacesRequest);
                             List<CompareFacesMatch> faceDetails = compareFacesResult.getFaceMatches();
@@ -213,7 +216,7 @@ public class DetectionService extends Service {
                     ex.printStackTrace();
                 }
             }
-        }, 0, 20000);
+        }, 0, 10000);
         return START_STICKY;
     }
 
@@ -251,7 +254,7 @@ public class DetectionService extends Service {
 
         // Vibrates phone
         Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-        vibrator.vibrate(VibrationEffect.createOneShot(1000,255));
+        vibrator.vibrate(VibrationEffect.createOneShot(3000,255));
 
         // Email owner of phone
         AmazonSNSClient snsClient = new AmazonSNSClient(mCredentialsProvider);
@@ -269,7 +272,7 @@ public class DetectionService extends Service {
         Intent trackerIntent = new Intent(this, TrackerService.class);
         trackerIntent.putExtra("username", mUsername);
         Log.i(TAG, "Passing " + mUsername + " to TrackerService");
-        startService(trackerIntent);
+//        startService(trackerIntent);
 
         // Lock down phone
         DevicePolicyManager deviceManager =
