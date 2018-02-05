@@ -68,6 +68,7 @@ public class DetectionService extends Service {
     private static final float CONFIDENCE_THRESHOLD = 70F;
     private static final int NOTIFICATION_ID = 104;
 
+    private NotificationManager mNotificationManager;
     private Notification mNotification;
     private Timer mTimer;
     private ArrayList<String> mUserList = new ArrayList<>();
@@ -84,6 +85,7 @@ public class DetectionService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand() called");
 
+        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mNotification = new Notification.Builder(this)
                 .setSmallIcon(R.drawable.ic_security_black_48dp)
                 .setContentTitle("Phone Protection")
@@ -93,8 +95,7 @@ public class DetectionService extends Service {
                 .setAutoCancel(false)
                 .setOngoing(true)
                 .build();
-
-        startForeground(NOTIFICATION_ID, mNotification);
+        mNotificationManager.notify(NOTIFICATION_ID, mNotification);
 
         mIntent = intent;
         mUsername = intent.getStringExtra("username");
@@ -224,30 +225,11 @@ public class DetectionService extends Service {
         Log.i(TAG, "lockDown() activated");
 
         // Upload picture of intruder to S3
-        CopyObjectRequest copyObjectRequest = new CopyObjectRequest(
-                BUCKET_NAME,
-                mIntent.getStringExtra("username") + "/Intruder/99.jpg",
-                BUCKET_NAME,
-                mIntent.getStringExtra("username") + "/Intruder/98.jpg");
-        mS3Client.copyObject(copyObjectRequest);
-        try {
-            Thread.sleep(1000);
-        } catch (Exception ex) {}
-
-        copyObjectRequest = new CopyObjectRequest(
-                BUCKET_NAME,
-                mIntent.getStringExtra("username") + "/Intruder/100.jpg",
-                BUCKET_NAME,
-                mIntent.getStringExtra("username") + "/Intruder/99.jpg");
-        mS3Client.copyObject(copyObjectRequest);
-        try {
-            Thread.sleep(1000);
-        } catch (Exception ex) {}
         String randomID = UUID.randomUUID().toString();
         File file = new File(PATH_STREAM + "/Stream.jpg");
         TransferObserver observer = mTransferUtility.upload(
                 BUCKET_NAME,
-                mIntent.getStringExtra("username") + "/Intruder/" + 100 + ".jpg",
+                mIntent.getStringExtra("username") + "/Intruder/" + randomID + ".jpg",
                 file);
         Log.i(TAG, "Uploading");
         observer.setTransferListener(new UploadListener());
@@ -261,7 +243,7 @@ public class DetectionService extends Service {
         snsClient.setRegion(Region.getRegion(Regions.US_EAST_1));
         String msg = "Swiper No Swiping has identified this individual using your phone.\n" +
                 "https://s3.amazonaws.com/phoneprotectionpictures/" +
-                mUsername + "/Intruder/" + 100 + ".jpg\n\n" +
+                mUsername + "/Intruder/" + randomID + ".jpg\n\n" +
                 "Go to http://swipernoswiping.com/ to locate your phone";
         String subject = "IMPORTANT: Someone Has Your Phone";
         PublishRequest publishRequest = new PublishRequest(
