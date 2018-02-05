@@ -1,6 +1,7 @@
 package erikterwiel.phoneprotection;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.app.admin.DevicePolicyManager;
@@ -12,6 +13,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.SurfaceTexture;
 import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
@@ -67,6 +69,7 @@ public class DetectionService extends Service {
     private static final String BUCKET_NAME = "phoneprotectionpictures";
     private static final float CONFIDENCE_THRESHOLD = 70F;
     private static final int NOTIFICATION_ID = 104;
+    private static final String NOTIFICATION_CHANNEL = "105";
 
     private NotificationManager mNotificationManager;
     private Notification mNotification;
@@ -86,15 +89,30 @@ public class DetectionService extends Service {
         Log.i(TAG, "onStartCommand() called");
 
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        mNotification = new Notification.Builder(this)
-                .setSmallIcon(R.drawable.ic_security_black_48dp)
-                .setContentTitle("Phone Protection")
-                .setContentText("Monitoring phone users")
-                .setCategory(Notification.CATEGORY_STATUS)
-                .setPriority(Notification.PRIORITY_MIN)
-                .setAutoCancel(false)
-                .setOngoing(true)
-                .build();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL,
+                    "Swiper No Swiping Noficiation",
+                    NotificationManager.IMPORTANCE_LOW);
+            mNotificationManager.createNotificationChannel(channel);
+            Notification.Builder builder = new Notification.Builder(this, NOTIFICATION_CHANNEL);
+            builder.setSmallIcon(R.drawable.ic_security_black_48dp);
+            builder.setContentTitle("Protection Active");
+            builder.setContentText("Currently monitoring phone users");
+            builder.setCategory(Notification.CATEGORY_STATUS);
+            builder.setAutoCancel(false);
+            builder.setOngoing(true);
+            mNotification = builder.build();
+        } else {
+             mNotification = new Notification.Builder(this)
+                    .setSmallIcon(R.drawable.ic_security_black_48dp)
+                    .setContentTitle("Swiper No Swiping")
+                    .setContentText("Currently monitoring phone users")
+                    .setCategory(Notification.CATEGORY_STATUS)
+                    .setPriority(Notification.PRIORITY_LOW)
+                    .setAutoCancel(false)
+                    .setOngoing(true)
+                    .build();
+        }
         mNotificationManager.notify(NOTIFICATION_ID, mNotification);
 
         mIntent = intent;
@@ -310,6 +328,7 @@ public class DetectionService extends Service {
     public void onDestroy() {
         super.onDestroy();
         Log.i(TAG, "onDestroy() called");
+        mNotificationManager.cancel(NOTIFICATION_ID);
         mTimer.cancel();
         mTimer.purge();
         stopForeground(true);
