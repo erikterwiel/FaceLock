@@ -79,7 +79,7 @@
             android:label="@string/phone_label"></activity>
         <activity
             android:name=".SettingsActivity"
-            android:theme="@style/AppThemeNoBar"></activity>
+            android:label="@string/settings_label"/>
     </application>
 
 </manifest>

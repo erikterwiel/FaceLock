@@ -3,8 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/settings_back"
-        android:title="@string/settings_back"
-        android:icon="@drawable/ic_arrow_back_white_48dp"
+        android:id="@+id/settings_done"
+        android:title="@string/settings_done"
+        android:icon="@drawable/ic_done_white_48dp"
         app:showAsAction="always"/>
 </menu>

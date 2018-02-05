@@ -24,7 +24,8 @@
     <string name="home_start">Enable Protection</string>
     <string name="home_stop">Disable Protection</string>
     <string name="home_settings">Settings</string>
-    <string name="settings_back">Back</string>
+    <string name="settings_label">Settings</string>
+    <string name="settings_done">Done</string>
     <string name="add_label">Add User</string>
     <string name="add_done">Done</string>
     <string name="add_name">User name</string>
