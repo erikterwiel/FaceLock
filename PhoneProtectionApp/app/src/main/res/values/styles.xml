@@ -9,6 +9,13 @@
         <item name="android:colorBackground">@color/background_material_light</item>
         <item name="android:textColorPrimaryInverse">@color/primary_text_material_dark</item>
         <item name="android:textColorPrimary">@color/text_color_primary</item>
+        <item name="android:statusBarColor">@color/snsStatusBar</item>
+    </style>
+
+    <style
+        name="splash_screen"
+        parent="AppTheme">
+        <item name="android:windowBackground">@drawable/splash_screen</item>
     </style>
 
 </resources>

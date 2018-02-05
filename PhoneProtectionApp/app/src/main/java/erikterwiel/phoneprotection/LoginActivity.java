@@ -34,6 +34,8 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.Authentic
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.GetDetailsHandler;
 import com.amazonaws.regions.Regions;
 
+import java.util.List;
+
 public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity.java";
@@ -55,6 +57,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         Log.i(TAG, "onCreate() called");
+        setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
@@ -68,11 +71,24 @@ public class LoginActivity extends AppCompatActivity {
                         Manifest.permission.CAMERA},
                 REQUEST_PERMISSION);
 
-        ComponentName compName = new ComponentName(this, MyAdminReceiver.class);
-        Intent adminIntent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
-        adminIntent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, compName);
-        adminIntent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "To Lock Screen");
-        startActivityForResult(adminIntent, REQUEST_ADMIN);
+        DevicePolicyManager devicePolicyManager =
+                (DevicePolicyManager) getSystemService(DEVICE_POLICY_SERVICE);
+        List<ComponentName> admins = devicePolicyManager.getActiveAdmins();
+        boolean isAdminApp = false;
+        for (ComponentName name : admins) {
+            if (name.getClassName().equals("erikterwiel.phoneprotection.MyAdminReceiver")) {
+                isAdminApp = true;
+                break;
+            }
+        }
+        if (!isAdminApp) {
+            ComponentName compName = new ComponentName(this, MyAdminReceiver.class);
+            Intent adminIntent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+            adminIntent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, compName);
+            adminIntent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION,
+                    "Admin app privilege needed to lock the screen on lock down.");
+            startActivityForResult(adminIntent, REQUEST_ADMIN);
+        }
 
         ClientConfiguration clientConfiguration = new ClientConfiguration();
         mUserPool = new CognitoUserPool(
