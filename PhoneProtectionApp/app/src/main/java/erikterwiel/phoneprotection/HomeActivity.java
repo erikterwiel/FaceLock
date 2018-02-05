@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.provider.Settings;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -147,6 +148,14 @@ public class HomeActivity extends AppCompatActivity {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.home_settings, menu);
         mSettings = menu.findItem(R.id.home_settings);
+        mSettings.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                Intent settingsIntent = new Intent(HomeActivity.this, SettingsActivity.class);
+                startActivity(settingsIntent);
+                return false;
+            }
+        });
         return super.onCreateOptionsMenu(menu);
     }
 

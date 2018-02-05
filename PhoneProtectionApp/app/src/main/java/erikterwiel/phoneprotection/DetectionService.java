@@ -260,7 +260,7 @@ public class DetectionService extends Service {
         Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         vibrator.vibrate(VibrationEffect.createOneShot(3000,255));
 
-        // Email owner of phone
+        // Emails and texts owner of phone
         AmazonSNSClient snsClient = new AmazonSNSClient(mCredentialsProvider);
         snsClient.setRegion(Region.getRegion(Regions.US_EAST_1));
         String msg = "Swiper No Swiping has identified this individual using your phone.\n" +

@@ -34,37 +34,35 @@
         </activity>
         <activity
             android:name=".RegisterActivity"
-            android:label="@string/register_label"/>
+            android:label="@string/register_label" />
         <activity
             android:name=".HomeActivity"
-            android:label="@string/home_label"/>
+            android:label="@string/home_label" />
         <activity
             android:name=".AddUserActivity"
-            android:label="@string/add_label"/>
+            android:label="@string/add_label" />
 
         <receiver
-            android:name="MyAdminReceiver"
+            android:name=".MyAdminReceiver"
             android:permission="android.permission.BIND_DEVICE_ADMIN">
             <meta-data
                 android:name="android.app.device_admin"
-                android:resource="@xml/admin"/>
+                android:resource="@xml/admin" />
 
             <intent-filter>
-                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED"/>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
             </intent-filter>
         </receiver>
 
         <service
             android:name="com.amazonaws.mobileconnectors.s3.transferutility.TransferService"
             android:enabled="true" />
-        
         <service
             android:name=".DetectionService"
             android:enabled="true" />
-
         <service
             android:name=".TrackerService"
-            android:enabled="true"/>
+            android:enabled="true" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -78,8 +76,10 @@
 
         <activity
             android:name=".AddPhoneActivity"
-            android:label="@string/phone_label">
-        </activity>
+            android:label="@string/phone_label"></activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:theme="@style/AppThemeNoBar"></activity>
     </application>
 
 </manifest>
