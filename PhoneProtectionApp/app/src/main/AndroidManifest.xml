@@ -26,11 +26,6 @@
             android:name=".LoginActivity"
             android:label="@string/login_label"
             android:theme="@style/splash_screen">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".RegisterActivity"
@@ -79,7 +74,13 @@
             android:label="@string/phone_label"></activity>
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/settings_label"/>
+            android:label="@string/settings_label" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
