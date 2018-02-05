@@ -206,28 +206,32 @@ public class DetectionService extends Service {
                     // Compares faces if above fail contains a face
                     if (isFace) {
                         for (int i = 0; i < mUserList.size(); i++) {
-                            Log.i(TAG, "Attempting to compare faces");
-                            CompareFacesRequest compareFacesRequest = new CompareFacesRequest()
-                                    .withSourceImage(new Image()
-                                    .withS3Object(new S3Object()
-                                    .withName(mBucketFiles.get(i))
-                                    .withBucket(BUCKET_NAME)))
-                                    .withTargetImage(targetImage)
-                                    .withSimilarityThreshold(CONFIDENCE_THRESHOLD);
-                            Log.i(TAG, "Comparing face to " + mBucketFiles.get(i) + " in " + BUCKET_NAME);
-                            CompareFacesResult compareFacesResult =
-                                    mRekognition.compareFaces(compareFacesRequest);
-                            List<CompareFacesMatch> faceDetails = compareFacesResult.getFaceMatches();
-                            for (int j = 0; j < faceDetails.size(); j++) {
-                                ComparedFace face = faceDetails.get(j).getFace();
-                                BoundingBox position = face.getBoundingBox();
-                                Log.i(TAG, "Face at " + position.getLeft().toString()
-                                        + " " + position.getTop()
-                                        + " matches with " + face.getConfidence().toString()
-                                        + "% confidence.");
-                                isUser = true;
+                            String[] inputNameSplit = mBucketFiles.get(i).split("/");
+                            if (!inputNameSplit[1].equals("Faustin.jpg") &&
+                                    !inputNameSplit[1].equals("Mansour.jpg")) {
+                                Log.i(TAG, "Attempting to compare faces");
+                                CompareFacesRequest compareFacesRequest = new CompareFacesRequest()
+                                        .withSourceImage(new Image()
+                                                .withS3Object(new S3Object()
+                                                        .withName(mBucketFiles.get(i))
+                                                        .withBucket(BUCKET_NAME)))
+                                        .withTargetImage(targetImage)
+                                        .withSimilarityThreshold(CONFIDENCE_THRESHOLD);
+                                Log.i(TAG, "Comparing face to " + mBucketFiles.get(i) + " in " + BUCKET_NAME);
+                                CompareFacesResult compareFacesResult =
+                                        mRekognition.compareFaces(compareFacesRequest);
+                                List<CompareFacesMatch> faceDetails = compareFacesResult.getFaceMatches();
+                                for (int j = 0; j < faceDetails.size(); j++) {
+                                    ComparedFace face = faceDetails.get(j).getFace();
+                                    BoundingBox position = face.getBoundingBox();
+                                    Log.i(TAG, "Face at " + position.getLeft().toString()
+                                            + " " + position.getTop()
+                                            + " matches with " + face.getConfidence().toString()
+                                            + "% confidence.");
+                                    isUser = true;
+                                }
+                                if (isUser) break;
                             }
-                            if (isUser) break;
                         }
                         if (!isUser) lockDown();
                     }
