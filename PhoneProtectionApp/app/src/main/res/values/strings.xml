@@ -3,8 +3,8 @@
     <string name="login_label">Swiper No Swiping</string>
     <string name="login_email">Email</string>
     <string name="login_password">Password</string>
-    <string name="login_login">Login</string>
-    <string name="login_register">Register</string>
+    <string name="login_login">Sign In</string>
+    <string name="login_register">Sign Up</string>
     <string name="register_label">Register</string>
     <string name="register_done">Done</string>
     <string name="register_email">Email</string>

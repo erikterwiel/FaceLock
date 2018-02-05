@@ -3,8 +3,15 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="16dp"
-    android:orientation="vertical">
+    android:padding="16dp"
+    android:orientation="vertical"
+    android:background="@color/colorPrimary"
+    android:gravity="center_horizontal">
+    <ImageView
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:layout_margin="32dp"
+        android:src="@drawable/ic_logo"/>
     <EditText
         android:id="@+id/login_email"
         android:layout_width="match_parent"
@@ -12,7 +19,7 @@
         android:layout_marginBottom="8dp"
         android:hint="@string/login_email"
         android:inputType="textEmailAddress"
-        android:textColor="@android:color/black"
+        android:textColor="@android:color/white"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
     <EditText
         android:id="@+id/login_password"
@@ -22,29 +29,22 @@
         android:hint="@string/login_password"
         android:inputType="textPassword"
         android:imeOptions="actionSend"
-        android:textColor="@android:color/black"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
-    <LinearLayout
-        android:layout_width="match_parent"
+        android:textColor="@android:color/white"
+        android:textAppearance="@style/password_text"/>
+    <Button
+        android:id="@+id/login_login"
+        android:layout_width="256dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <Button
-            android:id="@+id/login_login"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginEnd="8dp"
-            android:background="@android:color/white"
-            android:textColor="@android:color/black"
-            android:text="@string/login_login"/>
-        <Button
-            android:id="@+id/login_register"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_weight="1"
-            android:background="@android:color/white"
-            android:textColor="@android:color/black"
-            android:text="@string/login_register"/>
-    </LinearLayout>
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="12dp"
+        android:background="@color/snsStatusBar"
+        android:textColor="@android:color/white"
+        android:text="@string/login_login"/>
+    <Button
+        android:id="@+id/login_register"
+        android:layout_width="256dp"
+        android:layout_height="wrap_content"
+        android:background="@color/snsStatusBar"
+        android:textColor="@android:color/white"
+        android:text="@string/login_register"/>
 </LinearLayout>
