@@ -110,36 +110,27 @@ public class HomeActivity extends AppCompatActivity {
         mStop = (Button) findViewById(R.id.home_stop);
         mAdd = (FloatingActionButton) findViewById(R.id.home_add);
 
-        mStart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mDetectionIntent.putExtra("size", mUserList.size());
-                for (int i = 0; i < mUserList.size(); i++) {
-                    mDetectionIntent.putExtra("user" + i, mUserList.get(i).getFileName());
-                    mDetectionIntent.putExtra("bucketfiles" + i, mUserList.get(i).getName() + ".jpg");
-                }
-                mDetectionIntent.putExtra("username", getIntent().getStringExtra("username"));
-                Snackbar.make(mCoordinator, "Protection enabled.", Snackbar.LENGTH_LONG).show();
-                Log.i(TAG, "Passing " + getIntent().getStringExtra("username") + " to DetectionService");
-                startService(mDetectionIntent);
+        mStart.setOnClickListener(view -> {
+            mDetectionIntent.putExtra("size", mUserList.size());
+            for (int i = 0; i < mUserList.size(); i++) {
+                mDetectionIntent.putExtra("user" + i, mUserList.get(i).getFileName());
+                mDetectionIntent.putExtra("bucketfiles" + i, mUserList.get(i).getName() + ".jpg");
             }
+            mDetectionIntent.putExtra("username", getIntent().getStringExtra("username"));
+            Snackbar.make(mCoordinator, "Protection enabled.", Snackbar.LENGTH_LONG).show();
+            Log.i(TAG, "Passing " + getIntent().getStringExtra("username") + " to DetectionService");
+            startService(mDetectionIntent);
         });
 
-        mStop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(mCoordinator, "Protection disabled.", Snackbar.LENGTH_LONG).show();
-                stopService(mDetectionIntent);
-            }
+        mStop.setOnClickListener(view -> {
+            Snackbar.make(mCoordinator, "Protection disabled.", Snackbar.LENGTH_LONG).show();
+            stopService(mDetectionIntent);
         });
 
-        mAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent addUserIntent = new Intent(HomeActivity.this, AddUserActivity.class);
-                addUserIntent.putExtra("username", getIntent().getStringExtra("username"));
-                startActivityForResult(addUserIntent, REQUEST_ADD);
-            }
+        mAdd.setOnClickListener(view -> {
+            Intent addUserIntent = new Intent(HomeActivity.this, AddUserActivity.class);
+            addUserIntent.putExtra("username", getIntent().getStringExtra("username"));
+            startActivityForResult(addUserIntent, REQUEST_ADD);
         });
     }
 
@@ -148,14 +139,11 @@ public class HomeActivity extends AppCompatActivity {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.home_settings, menu);
         mSettings = menu.findItem(R.id.home_settings);
-        mSettings.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                Intent settingsIntent = new Intent(HomeActivity.this, SettingsActivity.class);
-                startActivity(settingsIntent);
-                return false;
-            }
-        });
+        mSettings.setOnMenuItemClickListener(onMenuItemClickListener -> {
+            Intent settingsIntent = new Intent(HomeActivity.this, SettingsActivity.class);
+            startActivity(settingsIntent);
+            return false;
+        })
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -195,15 +183,12 @@ public class HomeActivity extends AppCompatActivity {
     private void initLocation() {
         try {
             mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-            mFusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                @Override
-                public void onSuccess(Location location) {
-                    if (location != null) {
-                        mLatitude.setText("Latitude: " + location.getLatitude());
-                        mLongitude.setText("Longitude: " + location.getLongitude());
-                        mLocation = location;
-                        new UpdatePhone().execute();
-                    }
+            mFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
+                if (location != null) {
+                    mLatitude.setText("Latitude: " + location.getLatitude());
+                    mLongitude.setText("Longitude: " + location.getLongitude());
+                    mLocation = location;
+                    new UpdatePhone().execute();
                 }
             });
         } catch (SecurityException ex) {

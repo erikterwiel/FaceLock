@@ -1,16 +1,14 @@
 package erikterwiel.phoneprotection;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.ActionMenuView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -37,24 +35,22 @@ public class SettingsActivity extends AppCompatActivity {
         mScanBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                mScanDisplay.setText(i + "s");
+                int frequency = (int) (Math.pow(0.298329 * i, 2)) + 10;
+                mScanDisplay.setText(frequency + "s");
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
+            public void onStartTrackingTouch(SeekBar seekBar) {}
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
+            public void onStopTrackingTouch(SeekBar seekBar) {}
         });
         mSafeDisplay.setText(mSafeBar.getProgress() + "s");
         mSafeBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                mSafeDisplay.setText(i + "s");
+                int frequency = (int) (0.59 * i) + 1;
+                mSafeDisplay.setText(frequency + "m");
             }
 
             @Override
@@ -75,6 +71,7 @@ public class SettingsActivity extends AppCompatActivity {
         menuInflater.inflate(R.menu.settings_done, menu);
         mDone = menu.findItem(R.id.settings_done);
         mDone.setOnMenuItemClickListener((menuItem) -> {
+            Toast.makeText(SettingsActivity.this, "Settings saved", Toast.LENGTH_LONG).show();
             finish();
             return false;
         });
