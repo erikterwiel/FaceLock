@@ -164,9 +164,11 @@ public class HomeActivity extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
+            mDialog = new ProgressDialog()
             mDialog = ProgressDialog.show(HomeActivity.this,
                     getString(R.string.home_downloading),
                     getString(R.string.home_wait));
+//            mDialog.
         }
 
         @Override

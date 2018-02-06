@@ -28,6 +28,9 @@
     <string name="settings_done">Done</string>
     <string name="settings_scan_frequency">Scan Frequency</string>
     <string name="settings_safe_mode_duration">Safe Mode Duration</string>
+    <string name="settings_lock_down">Lock Down</string>
+    <string name="settings_alarm_title">Play alarm on lock down</string>
+    <string name="settings_alarm_description">Your phone will play a siren when an unauthorized user is detected.</string>
     <string name="add_label">Add User</string>
     <string name="add_done">Done</string>
     <string name="add_name">User name</string>
