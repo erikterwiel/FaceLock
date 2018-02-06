@@ -26,6 +26,7 @@ public class SettingsActivity extends AppCompatActivity {
     private SeekBar mSafeBar;
     private TextView mSafeDisplay;
     private Switch mSirenToggle;
+    private Switch mMaxToggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +42,7 @@ public class SettingsActivity extends AppCompatActivity {
         mSafeBar = (SeekBar) findViewById(R.id.settings_safe_mode_duration_bar);
         mSafeDisplay = (TextView) findViewById(R.id.settings_safe_mode_duration_display);
         mSirenToggle = (Switch) findViewById(R.id.settings_siren_toggle);
+        mMaxToggle = (Switch) findViewById(R.id.settings_max_volume_toggle);
 
         mScanBar.setProgress((int) (Math.sqrt(mDatabase.getInt("scan_frequency", 10000) / 1000 - 10) / 0.298329));
         mScanDisplay.setText(((int) Math.pow(0.298329 * mScanBar.getProgress(), 2) + 10) + "s");
@@ -79,6 +81,11 @@ public class SettingsActivity extends AppCompatActivity {
         mSirenToggle.setChecked(mDatabase.getBoolean("siren", false));
         mSirenToggle.setOnCheckedChangeListener((compoundButton, isChecked) -> {
             mDatabaseEditor.putBoolean("siren", isChecked);
+        });
+
+        mMaxToggle.setChecked(mDatabase.getBoolean("max", false));
+        mMaxToggle.setOnCheckedChangeListener((compoundButton, isChecked) -> {
+            mDatabaseEditor.putBoolean("max", isChecked);
         });
     }
 

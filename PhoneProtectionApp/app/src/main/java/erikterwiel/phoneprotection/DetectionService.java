@@ -267,11 +267,13 @@ public class DetectionService extends Service {
 
         // Plays siren if selected
         if (mDatabase.getBoolean("siren", false)) {
-            AudioManager am = (AudioManager) getSystemService(AUDIO_SERVICE);
-            am.setStreamVolume(
-                    AudioManager.STREAM_SYSTEM,
-                    am.getStreamMaxVolume(AudioManager.STREAM_SYSTEM),
-                    0);
+            if (mDatabase.getBoolean("max", false)) {
+                AudioManager am = (AudioManager) getSystemService(AUDIO_SERVICE);
+                am.setStreamVolume(
+                        AudioManager.STREAM_MUSIC,
+                        am.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
+                        0);
+            }
             mSiren = MediaPlayer.create(this, R.raw.siren);
             mSiren.start();
         }
@@ -290,7 +292,7 @@ public class DetectionService extends Service {
         String subject = "URGENT: Someone Has Your Phone";
         PublishRequest publishRequest = new PublishRequest(
                 "arn:aws:sns:us-east-1:132885165810:email-list", msg, subject);
-//        snsClient.publish(publishRequest);
+        snsClient.publish(publishRequest);
 
         // Starts rapid location services
         Intent trackerIntent = new Intent(this, TrackerService.class);
