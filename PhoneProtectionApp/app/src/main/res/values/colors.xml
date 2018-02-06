@@ -7,4 +7,5 @@
     <color name="primary_text_material_dark">#000000</color>
     <color name="text_color_primary">#ffffff</color>
     <color name="snsStatusBar">#207fdd</color>
+    <color name="snsAccent">#ff5722</color>
 </resources>
