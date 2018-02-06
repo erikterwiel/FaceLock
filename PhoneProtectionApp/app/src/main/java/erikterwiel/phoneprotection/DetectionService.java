@@ -8,6 +8,7 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.SurfaceTexture;
@@ -87,6 +88,8 @@ public class DetectionService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand() called");
+
+        SharedPreferences database = getSharedPreferences("settings", MODE_PRIVATE);
 
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -239,7 +242,7 @@ public class DetectionService extends Service {
                     ex.printStackTrace();
                 }
             }
-        }, 0, 10000);
+        }, 0, database.getInt("scan_frequency", 60000));
         return START_STICKY;
     }
 

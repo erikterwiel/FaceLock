@@ -17,7 +17,8 @@ public class SettingsActivity extends AppCompatActivity {
 
     private static final String TAG = "SettingsActivity.java";
 
-    SharedPreferences.Editor mDatabaseEditor
+    SharedPreferences mDatabase;
+    SharedPreferences.Editor mDatabaseEditor;
 
     private MenuItem mDone;
     private SeekBar mScanBar;
@@ -32,8 +33,8 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        SharedPreferences database = getSharedPreferences("settings", Context.MODE_PRIVATE);
-        mDatabaseEditor = database.edit();
+        mDatabase = getSharedPreferences("settings", Context.MODE_PRIVATE);
+        mDatabaseEditor = mDatabase.edit();
 
         mScanBar = (SeekBar) findViewById(R.id.settings_scan_frequency_bar);
         mScanDisplay = (TextView) findViewById(R.id.settings_scan_frequency_display);
@@ -41,7 +42,8 @@ public class SettingsActivity extends AppCompatActivity {
         mSafeDisplay = (TextView) findViewById(R.id.settings_safe_mode_duration_display);
         mSirenToggle = (Switch) findViewById(R.id.settings_siren_toggle);
 
-        mScanDisplay.setText(mScanBar.getProgress() + "s");
+        mScanBar.setProgress((int) (Math.sqrt(mDatabase.getInt("scan_frequency", 10000) / 1000 - 10) / 0.298329));
+        mScanDisplay.setText(((int) Math.pow(0.298329 * mScanBar.getProgress(), 2) + 10) + "s");
         mScanBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -57,7 +59,8 @@ public class SettingsActivity extends AppCompatActivity {
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
-        mSafeDisplay.setText(mSafeBar.getProgress() + "s");
+        mSafeBar.setProgress((int) ((mDatabase.getInt("safe_duration", 60000) / 60 / 1000 - 1) / 0.59));
+        mSafeDisplay.setText(((int) (0.59 * mSafeBar.getProgress()) + 1) + "m");
         mSafeBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -73,6 +76,7 @@ public class SettingsActivity extends AppCompatActivity {
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
+        mSirenToggle.setChecked(mDatabase.getBoolean("siren", false));
         mSirenToggle.setOnCheckedChangeListener((compoundButton, isChecked) -> {
             mDatabaseEditor.putBoolean("siren", isChecked);
         });
@@ -85,6 +89,7 @@ public class SettingsActivity extends AppCompatActivity {
         mDone = menu.findItem(R.id.settings_done);
         mDone.setOnMenuItemClickListener((menuItem) -> {
             mDatabaseEditor.apply();
+            Log.i(TAG, "Saved scan_frequency = " + mDatabase.getInt("scan_frequency", 0));
             Toast.makeText(SettingsActivity.this, "Settings saved", Toast.LENGTH_LONG).show();
             finish();
             return false;

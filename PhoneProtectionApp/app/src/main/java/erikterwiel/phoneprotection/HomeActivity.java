@@ -143,7 +143,7 @@ public class HomeActivity extends AppCompatActivity {
             Intent settingsIntent = new Intent(HomeActivity.this, SettingsActivity.class);
             startActivity(settingsIntent);
             return false;
-        })
+        });
         return super.onCreateOptionsMenu(menu);
     }
 
