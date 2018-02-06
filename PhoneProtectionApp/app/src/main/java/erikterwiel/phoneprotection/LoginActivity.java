@@ -69,7 +69,8 @@ public class LoginActivity extends AppCompatActivity {
                         Manifest.permission.ACCESS_FINE_LOCATION,
                         Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        Manifest.permission.CAMERA},
+                        Manifest.permission.CAMERA,
+                        Manifest.permission.ACCESS_NOTIFICATION_POLICY},
                 REQUEST_PERMISSION);
 
         DevicePolicyManager devicePolicyManager =

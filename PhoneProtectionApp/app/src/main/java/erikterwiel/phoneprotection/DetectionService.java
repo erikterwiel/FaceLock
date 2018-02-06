@@ -14,6 +14,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.SurfaceTexture;
 import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.VibrationEffect;
@@ -49,6 +52,7 @@ import com.amazonaws.util.IOUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -84,12 +88,14 @@ public class DetectionService extends Service {
     private SurfaceTexture mSurfaceTexture;
     private String mUsername;
     private Intent mIntent;
+    private SharedPreferences mDatabase;
+    private MediaPlayer mSiren;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand() called");
 
-        SharedPreferences database = getSharedPreferences("settings", MODE_PRIVATE);
+        mDatabase = getSharedPreferences("settings", MODE_PRIVATE);
 
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -242,7 +248,7 @@ public class DetectionService extends Service {
                     ex.printStackTrace();
                 }
             }
-        }, 0, database.getInt("scan_frequency", 60000));
+        }, 0, mDatabase.getInt("scan_frequency", 60000));
         return START_STICKY;
     }
 
@@ -259,6 +265,17 @@ public class DetectionService extends Service {
         Log.i(TAG, "Uploading");
         observer.setTransferListener(new UploadListener());
 
+        // Plays siren if selected
+        if (mDatabase.getBoolean("siren", false)) {
+            AudioManager am = (AudioManager) getSystemService(AUDIO_SERVICE);
+            am.setStreamVolume(
+                    AudioManager.STREAM_SYSTEM,
+                    am.getStreamMaxVolume(AudioManager.STREAM_SYSTEM),
+                    0);
+            mSiren = MediaPlayer.create(this, R.raw.siren);
+            mSiren.start();
+        }
+
         // Vibrates phone
         Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         vibrator.vibrate(VibrationEffect.createOneShot(3000,255));
@@ -270,10 +287,10 @@ public class DetectionService extends Service {
                 "https://s3.amazonaws.com/phoneprotectionpictures/" +
                 mUsername + "/Intruder/" + randomID + ".jpg\n\n" +
                 "Go to http://swipernoswiping.com/ to locate your phone";
-        String subject = "IMPORTANT: Someone Has Your Phone";
+        String subject = "URGENT: Someone Has Your Phone";
         PublishRequest publishRequest = new PublishRequest(
                 "arn:aws:sns:us-east-1:132885165810:email-list", msg, subject);
-        snsClient.publish(publishRequest);
+//        snsClient.publish(publishRequest);
 
         // Starts rapid location services
         Intent trackerIntent = new Intent(this, TrackerService.class);
@@ -338,6 +355,10 @@ public class DetectionService extends Service {
         mNotificationManager.cancel(NOTIFICATION_ID);
         mTimer.cancel();
         mTimer.purge();
+        if (mSiren != null) {
+            mSiren.stop();
+            mSiren.release();
+        }
         stopForeground(true);
     }
 
