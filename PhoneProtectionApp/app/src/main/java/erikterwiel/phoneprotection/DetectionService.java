@@ -8,6 +8,7 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -89,7 +90,6 @@ public class DetectionService extends Service {
     private String mUsername;
     private Intent mIntent;
     private SharedPreferences mDatabase;
-    private MediaPlayer mSiren;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -267,15 +267,9 @@ public class DetectionService extends Service {
 
         // Plays siren if selected
         if (mDatabase.getBoolean("siren", false)) {
-            if (mDatabase.getBoolean("max", false)) {
-                AudioManager am = (AudioManager) getSystemService(AUDIO_SERVICE);
-                am.setStreamVolume(
-                        AudioManager.STREAM_MUSIC,
-                        am.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
-                        0);
-            }
-            mSiren = MediaPlayer.create(this, R.raw.siren);
-            mSiren.start();
+            Log.i(TAG, "Starting SirenService");
+            Intent sirenIntent = new Intent(this, SirenService.class);
+            startService(sirenIntent);
         }
 
         // Vibrates phone
@@ -292,13 +286,13 @@ public class DetectionService extends Service {
         String subject = "URGENT: Someone Has Your Phone";
         PublishRequest publishRequest = new PublishRequest(
                 "arn:aws:sns:us-east-1:132885165810:email-list", msg, subject);
-        snsClient.publish(publishRequest);
+//        snsClient.publish(publishRequest);
 
         // Starts rapid location services
         Intent trackerIntent = new Intent(this, TrackerService.class);
         trackerIntent.putExtra("username", mUsername);
         Log.i(TAG, "Passing " + mUsername + " to TrackerService");
-//        startService(trackerIntent);
+        startService(trackerIntent);
 
         // Lock down phone
         DevicePolicyManager deviceManager =
@@ -357,10 +351,6 @@ public class DetectionService extends Service {
         mNotificationManager.cancel(NOTIFICATION_ID);
         mTimer.cancel();
         mTimer.purge();
-        if (mSiren != null) {
-            mSiren.stop();
-            mSiren.release();
-        }
         stopForeground(true);
     }
 
