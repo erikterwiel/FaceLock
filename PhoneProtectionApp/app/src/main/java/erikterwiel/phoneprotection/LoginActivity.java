@@ -36,12 +36,13 @@ import com.amazonaws.regions.Regions;
 
 import java.util.List;
 
+import static erikterwiel.phoneprotection.Cognito.CLIENT_ID;
+import static erikterwiel.phoneprotection.Cognito.CLIENT_SECRET;
+import static erikterwiel.phoneprotection.Cognito.POOL_ID;
+
 public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity.java";
-    private static final String POOL_ID_AUTH = "us-east-1_quEHfVOLz";
-    private static final String CLIENT_ID = "3f9c5tmbc37qkos75d69nfmbsm";
-    private static final String CLIENT_SECRET = "ikcnfkqik9k6srh3ms6bt7vpbsgj55s0h0bfrh435bkh0topkl4";
     private static final int REQUEST_PERMISSION = 100;
     private static final int REQUEST_ADMIN = 105;
 
@@ -94,7 +95,7 @@ public class LoginActivity extends AppCompatActivity {
 
         ClientConfiguration clientConfiguration = new ClientConfiguration();
         mUserPool = new CognitoUserPool(
-                this, POOL_ID_AUTH, CLIENT_ID, CLIENT_SECRET, clientConfiguration);
+                this, POOL_ID, CLIENT_ID, CLIENT_SECRET, clientConfiguration);
         mCognitoUser = mUserPool.getUser();
 
         mEmail = (EditText) findViewById(R.id.login_email);
@@ -120,50 +121,47 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        mLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.i(TAG, "onClick() called");
-                AuthenticationHandler authenticationHandler = new AuthenticationHandler() {
-                    @Override
-                    public void onSuccess(CognitoUserSession userSession, CognitoDevice newDevice) {
-                        Toast.makeText(LoginActivity.this,
-                                "Login successful.",
-                                Toast.LENGTH_LONG).show();
-                        Intent homeIntent = new Intent(LoginActivity.this, HomeActivity.class);
-                        homeIntent.putExtra("username", userSession.getUsername());
-                        Log.i(TAG, "Passing " + userSession.getUsername() + " to HomeActivity");
-                        startActivity(homeIntent);
-                    }
+        mLogin.setOnClickListener(view -> {
+            Log.i(TAG, "onClick() called");
+            AuthenticationHandler authenticationHandler = new AuthenticationHandler() {
+                @Override
+                public void onSuccess(CognitoUserSession userSession, CognitoDevice newDevice) {
+                    Toast.makeText(LoginActivity.this,
+                            "Login successful.",
+                            Toast.LENGTH_LONG).show();
+                    Intent homeIntent = new Intent(LoginActivity.this, HomeActivity.class);
+                    homeIntent.putExtra("username", userSession.getUsername());
+                    Log.i(TAG, "Passing " + userSession.getUsername() + " to HomeActivity");
+                    startActivity(homeIntent);
+                }
 
-                    @Override
-                    public void getAuthenticationDetails(AuthenticationContinuation authenticationContinuation, String userId) {
-                        AuthenticationDetails authenticationDetails = new AuthenticationDetails(
-                                mEmail.getText().toString(),
-                                mPassword.getText().toString(),
-                                null);
-                        authenticationContinuation.setAuthenticationDetails(authenticationDetails);
-                        authenticationContinuation.continueTask();
-                    }
+                @Override
+                public void getAuthenticationDetails(AuthenticationContinuation authenticationContinuation, String userId) {
+                    AuthenticationDetails authenticationDetails = new AuthenticationDetails(
+                            mEmail.getText().toString(),
+                            mPassword.getText().toString(),
+                            null);
+                    authenticationContinuation.setAuthenticationDetails(authenticationDetails);
+                    authenticationContinuation.continueTask();
+                }
 
-                    @Override
-                    public void getMFACode(MultiFactorAuthenticationContinuation continuation) {
-                        continuation.setMfaCode(null);
-                        continuation.continueTask();
-                    }
+                @Override
+                public void getMFACode(MultiFactorAuthenticationContinuation continuation) {
+                    continuation.setMfaCode(null);
+                    continuation.continueTask();
+                }
 
-                    @Override
-                    public void authenticationChallenge(ChallengeContinuation continuation) {}
+                @Override
+                public void authenticationChallenge(ChallengeContinuation continuation) {}
 
-                    @Override
-                    public void onFailure(Exception exception) {
-                        Toast.makeText(LoginActivity.this,
-                                "Login unsuccessful, please try again.",
-                                Toast.LENGTH_LONG).show();
-                    }
-                };
-                mCognitoUser.getSessionInBackground(authenticationHandler);
-            }
+                @Override
+                public void onFailure(Exception exception) {
+                    Toast.makeText(LoginActivity.this,
+                            "Login unsuccessful, please try again.",
+                            Toast.LENGTH_LONG).show();
+                }
+            };
+            mCognitoUser.getSessionInBackground(authenticationHandler);
         });
 
         mRegister.setOnClickListener(new View.OnClickListener() {
