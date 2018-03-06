@@ -129,10 +129,14 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this,
                             "Login successful.",
                             Toast.LENGTH_LONG).show();
-                    Intent homeIntent = new Intent(LoginActivity.this, HomeActivity.class);
-                    homeIntent.putExtra("username", userSession.getUsername());
-                    Log.i(TAG, "Passing " + userSession.getUsername() + " to HomeActivity");
-                    startActivity(homeIntent);
+                    Log.i(TAG, userSession.getUsername());
+                    Log.i(TAG, userSession.isValid() + "");
+                    Log.i(TAG, userSession.getAccessToken() + "");
+                    Log.i(TAG, userSession.getIdToken() + "");
+//                    Intent homeIntent = new Intent(LoginActivity.this, HomeActivity.class);
+//                    homeIntent.putExtra("username", userSession.getUsername());
+//                    Log.i(TAG, "Passing " + userSession.getUsername() + " to HomeActivity");
+//                    startActivity(homeIntent);
                 }
 
                 @Override
@@ -146,10 +150,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void getMFACode(MultiFactorAuthenticationContinuation continuation) {
-                    continuation.setMfaCode(null);
-                    continuation.continueTask();
-                }
+                public void getMFACode(MultiFactorAuthenticationContinuation continuation) {}
 
                 @Override
                 public void authenticationChallenge(ChallengeContinuation continuation) {}
@@ -159,6 +160,7 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this,
                             "Login unsuccessful, please try again.",
                             Toast.LENGTH_LONG).show();
+                    Log.i(TAG, exception.toString());
                 }
             };
             mCognitoUser.getSessionInBackground(authenticationHandler);

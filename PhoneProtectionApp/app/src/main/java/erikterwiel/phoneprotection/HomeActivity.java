@@ -15,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -80,6 +81,7 @@ public class HomeActivity extends AppCompatActivity {
     private Button mStart;
     private Button mStop;
     private FloatingActionButton mAdd;
+    private int mPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,6 +147,37 @@ public class HomeActivity extends AppCompatActivity {
             return false;
         });
         return super.onCreateOptionsMenu(menu);
+    }
+
+    public ItemTouchHelper.Callback createHelperCallBack() {
+        ItemTouchHelper.SimpleCallback simpleCallback =  new ItemTouchHelper.SimpleCallback(0,
+                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
+                                  RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(final RecyclerView.ViewHolder viewHolder, int swipeDir) {
+                onItemRemove(viewHolder);
+            }
+        };
+        return simpleCallback;
+    }
+
+    public void onItemRemove(RecyclerView.ViewHolder viewHolder) {
+        int position = viewHolder.getAdapterPosition();
+        Log.i(TAG, mUserList.get(position).getFileName());
+        mPosition = position;
+        new DeleteUser().execute();
+        try {
+            Thread.sleep(300);
+            mUserList.remove(mPosition);
+            mUserAdapter.notifyItemRemoved(mPosition);
+        } catch (Exception ex) {
+        }
     }
 
     private class DownloadPhone extends AsyncTask<Void, Void, Void> {
@@ -223,6 +256,22 @@ public class HomeActivity extends AppCompatActivity {
         Intent restartIntent = getIntent();
         finish();
         startActivity(restartIntent);
+    }
+
+    private class DeleteUser extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... inputs) {
+            String[] filePathSplit = mUserList.get(mPosition).getFileName().split("/");
+            String nameJpg = filePathSplit[filePathSplit.length - 2] + "/" + filePathSplit[filePathSplit.length - 1];
+            Log.i(TAG, nameJpg);
+            try {
+                mS3Client.deleteObject(BUCKET_NAME, nameJpg);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            return null;
+        }
     }
 
     private class DownloadUsers extends AsyncTask<Void, Void, Void> {
@@ -317,6 +366,8 @@ public class HomeActivity extends AppCompatActivity {
         mUsers.setLayoutManager(new LinearLayoutManager(this));
         mUserAdapter = new UserAdapter(mUserList);
         mUsers.setAdapter(mUserAdapter);
+        ItemTouchHelper itemTouchHelper= new ItemTouchHelper(createHelperCallBack());
+        itemTouchHelper.attachToRecyclerView(mUsers);
     }
 
     public TransferUtility getTransferUtility(Context context) {

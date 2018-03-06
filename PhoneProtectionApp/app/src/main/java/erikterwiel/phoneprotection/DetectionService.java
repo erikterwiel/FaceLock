@@ -8,16 +8,9 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.SurfaceTexture;
-import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
-import android.media.AudioAttributes;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.VibrationEffect;
@@ -45,7 +38,6 @@ import com.amazonaws.services.rekognition.model.Image;
 import com.amazonaws.services.rekognition.model.Label;
 import com.amazonaws.services.rekognition.model.S3Object;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CopyObjectRequest;
 import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.model.PublishRequest;
 import com.amazonaws.util.IOUtils;
@@ -53,7 +45,6 @@ import com.amazonaws.util.IOUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -61,10 +52,6 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class DetectionService extends Service {
 
@@ -73,13 +60,16 @@ public class DetectionService extends Service {
     private static final String POOL_REGION = "us-east-1";
     private static final String PATH_STREAM = "sdcard/Pictures/PhoneProtection/Stream";
     private static final String BUCKET_NAME = "phoneprotectionpictures";
-    private static final float CONFIDENCE_THRESHOLD = 70F;
-    private static final int NOTIFICATION_ID = 104;
+    private static final float CONFIDENCE_THRESHOLD = 70F;  
+    private static final int NOTIFICATION_SCAN = 104;
+    private static final int NOTIFICATION_PROTECTED = 106;
     private static final String NOTIFICATION_CHANNEL = "105";
 
     private NotificationManager mNotificationManager;
-    private Notification mNotification;
-    private Timer mTimer;
+    private Notification mScanNotification;
+    private Notification mProtectedNotification;
+    private Timer mScanTimer;
+    private Timer mPauseTimer;
     private ArrayList<String> mUserList = new ArrayList<>();
     private ArrayList<String> mBucketFiles = new ArrayList<>();
     private AWSCredentialsProvider mCredentialsProvider;
@@ -103,26 +93,42 @@ public class DetectionService extends Service {
                     "Swiper No Swiping Noficiation",
                     NotificationManager.IMPORTANCE_LOW);
             mNotificationManager.createNotificationChannel(channel);
-            Notification.Builder builder = new Notification.Builder(this, NOTIFICATION_CHANNEL);
-            builder.setSmallIcon(R.drawable.ic_security_black_48dp);
-            builder.setContentTitle("Protection Active");
-            builder.setContentText("Currently monitoring phone users");
-            builder.setCategory(Notification.CATEGORY_STATUS);
-            builder.setAutoCancel(false);
-            builder.setOngoing(true);
-            mNotification = builder.build();
+            Notification.Builder builder1 = new Notification.Builder(this, NOTIFICATION_CHANNEL);
+            builder1.setSmallIcon(R.drawable.ic_security_black_48dp);
+            builder1.setContentTitle("Protection Active");
+            builder1.setContentText("Currently monitoring phone users");
+            builder1.setCategory(Notification.CATEGORY_STATUS);
+            builder1.setAutoCancel(false);
+            builder1.setOngoing(true);
+            mScanNotification = builder1.build();
+            Notification.Builder builder2 = new Notification.Builder(this, NOTIFICATION_CHANNEL);
+            builder2.setSmallIcon(R.drawable.ic_check_black_48dp);
+            builder2.setContentTitle("Protection Active");
+            builder2.setContentText("Phone user identified as authorised");
+            builder2.setCategory(Notification.CATEGORY_STATUS);
+            builder2.setAutoCancel(false);
+            builder2.setOngoing(true);
+            mProtectedNotification = builder2.build();
         } else {
-             mNotification = new Notification.Builder(this)
+             mScanNotification = new Notification.Builder(this)
                     .setSmallIcon(R.drawable.ic_security_black_48dp)
-                    .setContentTitle("Swiper No Swiping")
-                    .setContentText("Currently monitoring phone users")
+                     .setContentTitle("Protection Active")
+                     .setContentText("Currently monitoring phone users")
+                     .setCategory(Notification.CATEGORY_STATUS)
+                    .setPriority(Notification.PRIORITY_LOW)
+                    .setAutoCancel(false)
+                    .setOngoing(true)
+                    .build();
+            mProtectedNotification = new Notification.Builder(this)
+                    .setSmallIcon(R.drawable.ic_check_black_48dp)
+                    .setContentTitle("Protection Active")
+                    .setContentText("Phone user identified as authorised")
                     .setCategory(Notification.CATEGORY_STATUS)
                     .setPriority(Notification.PRIORITY_LOW)
                     .setAutoCancel(false)
                     .setOngoing(true)
                     .build();
         }
-        mNotificationManager.notify(NOTIFICATION_ID, mNotification);
 
         mIntent = intent;
         mUsername = intent.getStringExtra("username");
@@ -140,9 +146,20 @@ public class DetectionService extends Service {
                 POOL_ID_UNAUTH,
                 Regions.fromName(POOL_REGION));
         mRekognition = new AmazonRekognitionClient(mCredentialsProvider);
+        enableProtection();
+        return START_STICKY;
+    }
 
-        mTimer = new Timer();
-        mTimer.scheduleAtFixedRate(new TimerTask() {
+    private void enableProtection() {
+        mNotificationManager.cancel(NOTIFICATION_PROTECTED);
+        mNotificationManager.notify(NOTIFICATION_SCAN, mScanNotification);
+        Log.i(TAG, "enableProtection() called");
+        if (mPauseTimer != null) {
+            mPauseTimer.cancel();
+            mPauseTimer.purge();
+        }
+        mScanTimer = new Timer();
+        mScanTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 Log.i(TAG, "run() called");
@@ -239,7 +256,10 @@ public class DetectionService extends Service {
                                             + "% confidence.");
                                     isUser = true;
                                 }
-                                if (isUser) break;
+                                if (isUser) {
+                                    disableProtection();
+                                    break;
+                                }
                             }
                         }
                         if (!isUser) lockDown();
@@ -249,7 +269,26 @@ public class DetectionService extends Service {
                 }
             }
         }, 0, mDatabase.getInt("scan_frequency", 60000));
-        return START_STICKY;
+
+    }
+
+    private void disableProtection() {
+        Log.i(TAG, "disableProtection() called");
+        mNotificationManager.cancel(NOTIFICATION_SCAN);
+        mNotificationManager.notify(NOTIFICATION_PROTECTED, mProtectedNotification);
+        if (mScanTimer != null) {
+            mScanTimer.cancel();
+            mScanTimer.purge();
+        }
+
+        mPauseTimer = new Timer();
+        Log.i(TAG, "enableProtection() in " + (mDatabase.getInt("safe_duration", 900000)/1000 + "seconds"));
+        mPauseTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                enableProtection();
+            }
+        }, mDatabase.getInt("safe_duration", 900000), 7200000);
     }
 
     private void lockDown() {
@@ -286,7 +325,7 @@ public class DetectionService extends Service {
         String subject = "URGENT: Someone Has Your Phone";
         PublishRequest publishRequest = new PublishRequest(
                 "arn:aws:sns:us-east-1:132885165810:email-list", msg, subject);
-//        snsClient.publish(publishRequest);
+        snsClient.publish(publishRequest);
 
         // Starts rapid location services
         Intent trackerIntent = new Intent(this, TrackerService.class);
@@ -348,9 +387,16 @@ public class DetectionService extends Service {
     public void onDestroy() {
         super.onDestroy();
         Log.i(TAG, "onDestroy() called");
-        mNotificationManager.cancel(NOTIFICATION_ID);
-        mTimer.cancel();
-        mTimer.purge();
+        mNotificationManager.cancel(NOTIFICATION_SCAN);
+        mNotificationManager.cancel(NOTIFICATION_PROTECTED);
+        if (mScanTimer != null) {
+            mScanTimer.cancel();
+            mScanTimer.purge();
+        }
+        if (mPauseTimer != null) {
+            mPauseTimer.cancel();
+            mPauseTimer.purge();
+        }
         stopForeground(true);
     }
 
