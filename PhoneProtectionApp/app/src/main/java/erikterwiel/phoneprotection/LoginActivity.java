@@ -9,21 +9,15 @@ import android.content.SharedPreferences;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Html;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amazonaws.ClientConfiguration;
-import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
-import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserDetails;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserPool;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserSession;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.AuthenticationContinuation;
@@ -31,14 +25,12 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.Auth
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.ChallengeContinuation;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.MultiFactorAuthenticationContinuation;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.AuthenticationHandler;
-import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.GetDetailsHandler;
-import com.amazonaws.regions.Regions;
 
 import java.util.List;
 
+import static erikterwiel.phoneprotection.Cognito.POOL_ID;
 import static erikterwiel.phoneprotection.Cognito.CLIENT_ID;
 import static erikterwiel.phoneprotection.Cognito.CLIENT_SECRET;
-import static erikterwiel.phoneprotection.Cognito.POOL_ID;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -93,11 +85,6 @@ public class LoginActivity extends AppCompatActivity {
             startActivityForResult(adminIntent, REQUEST_ADMIN);
         }
 
-        ClientConfiguration clientConfiguration = new ClientConfiguration();
-        mUserPool = new CognitoUserPool(
-                this, POOL_ID, CLIENT_ID, CLIENT_SECRET, clientConfiguration);
-        mCognitoUser = mUserPool.getUser();
-
         mEmail = (EditText) findViewById(R.id.login_email);
         mPassword = (EditText) findViewById(R.id.login_password);
         mLogin = (Button) findViewById(R.id.login_login);
@@ -109,44 +96,40 @@ public class LoginActivity extends AppCompatActivity {
             mPassword.requestFocus();
         }
 
-        mPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int actionID, KeyEvent keyEvent) {
-                if (actionID == EditorInfo.IME_ACTION_SEND) {
-                    Log.i(TAG, "Attempting to perform a click");
-                    mLogin.performClick();
-                    return true;
-                }
-                return false;
-            }
-        });
-
+        ClientConfiguration clientConfiguration = new ClientConfiguration();
+        mUserPool = new CognitoUserPool(
+                this, POOL_ID, CLIENT_ID, CLIENT_SECRET, clientConfiguration);
         mLogin.setOnClickListener(view -> {
-            Log.i(TAG, "onClick() called");
-            AuthenticationHandler authenticationHandler = new AuthenticationHandler() {
+            mCognitoUser = mUserPool.getUser();
+            AuthenticationHandler handler = new AuthenticationHandler() {
                 @Override
                 public void onSuccess(CognitoUserSession userSession, CognitoDevice newDevice) {
-                    Toast.makeText(LoginActivity.this,
-                            "Login successful.",
-                            Toast.LENGTH_LONG).show();
-                    Log.i(TAG, userSession.getUsername());
-                    Log.i(TAG, userSession.isValid() + "");
-                    Log.i(TAG, userSession.getAccessToken() + "");
-                    Log.i(TAG, userSession.getIdToken() + "");
-//                    Intent homeIntent = new Intent(LoginActivity.this, HomeActivity.class);
-//                    homeIntent.putExtra("username", userSession.getUsername());
-//                    Log.i(TAG, "Passing " + userSession.getUsername() + " to HomeActivity");
-//                    startActivity(homeIntent);
+                    Toast.makeText(
+                            LoginActivity.this,
+                            "Authentication successful, loading...",
+                            Toast.LENGTH_SHORT).show();
+                    Intent homeIntent = new Intent(LoginActivity.this, HomeActivity.class);
+                    homeIntent.putExtra("username", userSession.getUsername());
+                    startActivity(homeIntent);
                 }
 
                 @Override
-                public void getAuthenticationDetails(AuthenticationContinuation authenticationContinuation, String userId) {
-                    AuthenticationDetails authenticationDetails = new AuthenticationDetails(
-                            mEmail.getText().toString(),
+                public void onFailure(Exception exception) {
+                    Toast.makeText(
+                            LoginActivity.this,
+                            exception.getMessage().split("\\(")[0],
+                            Toast.LENGTH_LONG).show();
+                }
+
+                @Override
+                public void getAuthenticationDetails(AuthenticationContinuation continuation, String userId) {
+                    AuthenticationDetails authDetails = new AuthenticationDetails(
+                            mEmail.getText().toString() ,
                             mPassword.getText().toString(),
-                            null);
-                    authenticationContinuation.setAuthenticationDetails(authenticationDetails);
-                    authenticationContinuation.continueTask();
+                            null
+                    );
+                    continuation.setAuthenticationDetails(authDetails);
+                    continuation.continueTask();
                 }
 
                 @Override
@@ -154,24 +137,22 @@ public class LoginActivity extends AppCompatActivity {
 
                 @Override
                 public void authenticationChallenge(ChallengeContinuation continuation) {}
-
-                @Override
-                public void onFailure(Exception exception) {
-                    Toast.makeText(LoginActivity.this,
-                            "Login unsuccessful, please try again.",
-                            Toast.LENGTH_LONG).show();
-                    Log.i(TAG, exception.toString());
-                }
             };
-            mCognitoUser.getSessionInBackground(authenticationHandler);
+            mCognitoUser.getSessionInBackground(handler);
         });
 
-        mRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent registerIntent = new Intent(LoginActivity.this, RegisterActivity.class);
-                startActivity(registerIntent);
+        mPassword.setOnEditorActionListener((textView, actionID, keyEvent) -> {
+            if (actionID == EditorInfo.IME_ACTION_SEND) {
+                Log.i(TAG, "Attempting to perform a click");
+                mLogin.performClick();
+                return true;
             }
+            return false;
+        });
+
+        mRegister.setOnClickListener(view -> {
+            Intent registerIntent = new Intent(LoginActivity.this, RegisterActivity.class);
+            startActivity(registerIntent);
         });
     }
 
