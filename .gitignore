@@ -1,1 +1,2 @@
-PhoneProtectionApp/app/src/main/java/erikterwiel/phoneprotection/Cognito.java
+PhoneProtectionApp/app/src/main/java/erikterwiel/phoneprotection/CognitoKeys.java
+PhoneProtectionApp/app/src/main/java/erikterwiel/phoneprotection/DynamoDBKeys.java

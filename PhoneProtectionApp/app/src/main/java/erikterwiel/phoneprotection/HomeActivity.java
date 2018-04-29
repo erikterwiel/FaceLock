@@ -52,8 +52,6 @@ import java.util.List;
 public class HomeActivity extends AppCompatActivity {
 
     private static final String TAG = "HomeActivity.java";
-    private static final String POOL_ID_UNAUTH = "us-east-1:d2040261-6a0f-4cba-af96-8ead1b66ec38";
-    private static final String POOL_REGION = "us-east-1";
     private static final String BUCKET_NAME = "phoneprotectionpictures";
     private static final int REQUEST_PHONE = 102;
     private static final int REQUEST_ADD = 103;
@@ -93,12 +91,7 @@ public class HomeActivity extends AppCompatActivity {
         mDetectionIntent = new Intent(this, DetectionService.class);
 
         mTransferUtility = getTransferUtility(this);
-        CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
-                getApplicationContext(),
-                POOL_ID_UNAUTH,
-                Regions.US_EAST_1);
-        mDDBClient = new AmazonDynamoDBClient(credentialsProvider);
-        mMapper = new DynamoDBMapper(mDDBClient);
+        mMapper = DynamoDB.getInstance().getMapper();
 
         new DownloadPhone().execute();
         new DownloadUsers().execute();
@@ -314,7 +307,7 @@ public class HomeActivity extends AppCompatActivity {
         File folder = new File("sdcard/Pictures/PhoneProtection/Input");
         if (!folder.exists()) folder.mkdir();
         File file = new File(folder, key);
-        TransferObserver observer = mTransferUtility.download(BUCKET_NAME, key, file);
+        TransferObserver observer = `.download(BUCKET_NAME, key, file);
         observer.setTransferListener(new DownloadListener());
 
         User user = new User();

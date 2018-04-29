@@ -28,9 +28,9 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.Authentic
 
 import java.util.List;
 
-import static erikterwiel.phoneprotection.Cognito.POOL_ID;
-import static erikterwiel.phoneprotection.Cognito.CLIENT_ID;
-import static erikterwiel.phoneprotection.Cognito.CLIENT_SECRET;
+import static erikterwiel.phoneprotection.CognitoKeys.POOL_ID;
+import static erikterwiel.phoneprotection.CognitoKeys.CLIENT_ID;
+import static erikterwiel.phoneprotection.CognitoKeys.CLIENT_SECRET;
 
 public class LoginActivity extends AppCompatActivity {
 
