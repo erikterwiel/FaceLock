@@ -1,9 +1,10 @@
 package erikterwiel.phoneprotection;
 
-import android.app.Application;
+import android.content.Context;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 
 import static erikterwiel.phoneprotection.DynamoDBKeys.POOL_ID_UNAUTH;
@@ -12,20 +13,26 @@ import static erikterwiel.phoneprotection.DynamoDBKeys.POOL_REGION;
 
 class DynamoDB {
 
-    private static final DynamoDB instance = new DynamoDB();
+    private static DynamoDB instance;
     private DynamoDBMapper mapper;
 
-    private DynamoDB() {
+    private DynamoDB(Context context) {
         CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
-                //dagger2 context,
+                context,
                 POOL_ID_UNAUTH,
-                POOL_REGION);
+                Regions.fromName(POOL_REGION));
         AmazonDynamoDBClient DDBClient = new AmazonDynamoDBClient(credentialsProvider);
         mapper = new DynamoDBMapper(DDBClient);
     }
 
+    public static void init(Context context) {
+        if (instance == null) {
+            context = context.getApplicationContext();
+            instance = new DynamoDB(context);
+        }
+    }
 
-    static DynamoDB getInstance() {
+    public static DynamoDB getInstance() {
         return instance;
     }
 

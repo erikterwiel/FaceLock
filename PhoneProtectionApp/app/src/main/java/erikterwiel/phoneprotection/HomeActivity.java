@@ -49,6 +49,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static erikterwiel.phoneprotection.DynamoDBKeys.POOL_ID_UNAUTH;
+import static erikterwiel.phoneprotection.DynamoDBKeys.POOL_REGION;
+
 public class HomeActivity extends AppCompatActivity {
 
     private static final String TAG = "HomeActivity.java";
@@ -87,6 +90,8 @@ public class HomeActivity extends AppCompatActivity {
         Log.i(TAG, "onCreate() called");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        DynamoDB.init(this);
 
         mDetectionIntent = new Intent(this, DetectionService.class);
 
@@ -169,8 +174,7 @@ public class HomeActivity extends AppCompatActivity {
             Thread.sleep(300);
             mUserList.remove(mPosition);
             mUserAdapter.notifyItemRemoved(mPosition);
-        } catch (Exception ex) {
-        }
+        } catch (Exception ex) {}
     }
 
     private class DownloadPhone extends AsyncTask<Void, Void, Void> {
@@ -307,7 +311,7 @@ public class HomeActivity extends AppCompatActivity {
         File folder = new File("sdcard/Pictures/PhoneProtection/Input");
         if (!folder.exists()) folder.mkdir();
         File file = new File(folder, key);
-        TransferObserver observer = `.download(BUCKET_NAME, key, file);
+        TransferObserver observer = mTransferUtility.download(BUCKET_NAME, key, file);
         observer.setTransferListener(new DownloadListener());
 
         User user = new User();
