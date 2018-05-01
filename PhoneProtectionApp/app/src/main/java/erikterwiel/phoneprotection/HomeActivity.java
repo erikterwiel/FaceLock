@@ -59,10 +59,8 @@ public class HomeActivity extends AppCompatActivity {
     private static final int REQUEST_PHONE = 102;
     private static final int REQUEST_ADD = 103;
 
-    private TransferUtility mTransferUtility;
     private AmazonS3Client mS3Client;
-    private AWSCredentialsProvider mCredentialsProvider;
-    private AmazonDynamoDBClient mDDBClient;
+    private TransferUtility mTransferUtility;
     private DynamoDBMapper mMapper;
     private FusedLocationProviderClient mFusedLocationClient;
     private Username mPhone;
@@ -92,14 +90,15 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         DynamoDB.init(this);
-
-        mDetectionIntent = new Intent(this, DetectionService.class);
-
-        mTransferUtility = getTransferUtility(this);
+        S3.init(this);
         mMapper = DynamoDB.getInstance().getMapper();
+        mS3Client = S3.getInstance().getS3Client();
+        mTransferUtility = S3.getInstance().getTransferUtility();
 
         new DownloadPhone().execute();
         new DownloadUsers().execute();
+
+        mDetectionIntent = new Intent(this, DetectionService.class);
 
         mCoordinator = findViewById(R.id.home_coordinator);
         mLoading = findViewById(R.id.home_loading_users);
@@ -365,25 +364,6 @@ public class HomeActivity extends AppCompatActivity {
         mUsers.setAdapter(mUserAdapter);
         ItemTouchHelper itemTouchHelper= new ItemTouchHelper(createHelperCallBack());
         itemTouchHelper.attachToRecyclerView(mUsers);
-    }
-
-    public TransferUtility getTransferUtility(Context context) {
-        TransferUtility sTransferUtility = new TransferUtility(
-                getS3Client(context.getApplicationContext()), context.getApplicationContext());
-        return sTransferUtility;
-    }
-
-    public AmazonS3Client getS3Client(Context context) {
-        mS3Client = new AmazonS3Client(getCredProvider(context.getApplicationContext()));
-        return mS3Client;
-    }
-
-    private AWSCredentialsProvider getCredProvider(Context context) {
-        mCredentialsProvider = new CognitoCachingCredentialsProvider(
-                context.getApplicationContext(),
-                POOL_ID_UNAUTH,
-                Regions.fromName(POOL_REGION));
-        return mCredentialsProvider;
     }
 
     private class UserAdapter extends RecyclerView.Adapter<UserHolder> {

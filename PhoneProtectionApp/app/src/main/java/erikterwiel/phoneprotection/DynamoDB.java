@@ -10,7 +10,6 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import static erikterwiel.phoneprotection.DynamoDBKeys.POOL_ID_UNAUTH;
 import static erikterwiel.phoneprotection.DynamoDBKeys.POOL_REGION;
 
-
 class DynamoDB {
 
     private static DynamoDB instance;
