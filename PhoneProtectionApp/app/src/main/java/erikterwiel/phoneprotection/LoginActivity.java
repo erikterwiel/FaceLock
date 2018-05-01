@@ -85,10 +85,10 @@ public class LoginActivity extends AppCompatActivity {
             startActivityForResult(adminIntent, REQUEST_ADMIN);
         }
 
-        mEmail = (EditText) findViewById(R.id.login_email);
-        mPassword = (EditText) findViewById(R.id.login_password);
-        mLogin = (Button) findViewById(R.id.login_login);
-        mRegister = (Button) findViewById(R.id.login_register);
+        mEmail = findViewById(R.id.login_email);
+        mPassword = findViewById(R.id.login_password);
+        mLogin = findViewById(R.id.login_login);
+        mRegister = findViewById(R.id.login_register);
 
         mMemory = getSharedPreferences("memory", Context.MODE_PRIVATE);
         if (mMemory.contains("email")) {

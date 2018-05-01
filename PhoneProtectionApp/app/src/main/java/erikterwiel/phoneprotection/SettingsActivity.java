@@ -2,8 +2,8 @@ package erikterwiel.phoneprotection;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,12 +37,12 @@ public class SettingsActivity extends AppCompatActivity {
         mDatabase = getSharedPreferences("settings", Context.MODE_PRIVATE);
         mDatabaseEditor = mDatabase.edit();
 
-        mScanBar = (SeekBar) findViewById(R.id.settings_scan_frequency_bar);
-        mScanDisplay = (TextView) findViewById(R.id.settings_scan_frequency_display);
-        mSafeBar = (SeekBar) findViewById(R.id.settings_safe_mode_duration_bar);
-        mSafeDisplay = (TextView) findViewById(R.id.settings_safe_mode_duration_display);
-        mSirenToggle = (Switch) findViewById(R.id.settings_siren_toggle);
-        mMaxToggle = (Switch) findViewById(R.id.settings_max_volume_toggle);
+        mScanBar = findViewById(R.id.settings_scan_frequency_bar);
+        mScanDisplay = findViewById(R.id.settings_scan_frequency_display);
+        mSafeBar = findViewById(R.id.settings_safe_mode_duration_bar);
+        mSafeDisplay = findViewById(R.id.settings_safe_mode_duration_display);
+        mSirenToggle = findViewById(R.id.settings_siren_toggle);
+        mMaxToggle = findViewById(R.id.settings_max_volume_toggle);
 
         mScanBar.setProgress((int) (Math.sqrt(mDatabase.getInt("scan_frequency", 10000) / 1000 - 10) / 0.298329));
         mScanDisplay.setText(((int) Math.pow(0.298329 * mScanBar.getProgress(), 2) + 10) + "s");

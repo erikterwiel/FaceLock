@@ -1,43 +1,34 @@
 package erikterwiel.phoneprotection;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.amazonaws.auth.CognitoCachingCredentialsProvider;
-import com.amazonaws.mobileconnectors.s3.transfermanager.Transfer;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.s3.AmazonS3Client;
 
 import java.io.File;
 
 public class AddUserActivity extends AppCompatActivity {
 
     private static final String TAG = "AddUserActivity.java";
-    private static final String POOL_ID_UNAUTH = "us-east-1:d2040261-6a0f-4cba-af96-8ead1b66ec38";
-    private static final String POOL_REGION = "us-east-1";
     private static final String PROVIDER_AUTHORITY = "erikterwiel.phoneprotectionapp.fileprovider";
     private static final String BUCKET_NAME = "phoneprotectionpictures";
     private static final int REQUEST_CAMERA = 101;
 
-    private AmazonS3Client mS3Client;
     private TransferUtility mTransferUtility;
     private MenuItem mDone;
     private EditText mName;
@@ -50,11 +41,11 @@ public class AddUserActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_user);
 
-        mTransferUtility = getTransferUtility(this);
+        mTransferUtility = S3.getInstance().getTransferUtility();
 
-        mName = (EditText) findViewById(R.id.add_name);
-        mImage = (ImageView) findViewById(R.id.add_image);
-        mAdd = (Button) findViewById(R.id.add_add);
+        mName = findViewById(R.id.add_name);
+        mImage = findViewById(R.id.add_image);
+        mAdd = findViewById(R.id.add_add);
 
         mAdd.setOnClickListener(view -> {
             if (!mName.getText().toString().equals("")) {
@@ -101,34 +92,11 @@ public class AddUserActivity extends AppCompatActivity {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.add_done, menu);
         mDone = menu.findItem(R.id.add_done);
-        mDone.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                finish();
-                return false;
-            }
+        mDone.setOnMenuItemClickListener(menuItem -> {
+            finish();
+            return false;
         });
         return super.onCreateOptionsMenu(menu);
-    }
-
-    public TransferUtility getTransferUtility(Context context) {
-        mS3Client = getS3Client(context.getApplicationContext());
-        TransferUtility sTransferUtility = new TransferUtility(
-                mS3Client, context.getApplicationContext());
-        return sTransferUtility;
-    }
-
-    public static AmazonS3Client getS3Client(Context context) {
-        AmazonS3Client sS3Client = new AmazonS3Client(getCredProvider(context.getApplicationContext()));
-        return sS3Client;
-    }
-
-    private static CognitoCachingCredentialsProvider getCredProvider(Context context) {
-        CognitoCachingCredentialsProvider sCredProvider = new CognitoCachingCredentialsProvider(
-                context.getApplicationContext(),
-                POOL_ID_UNAUTH,
-                Regions.fromName(POOL_REGION));
-        return sCredProvider;
     }
 
     private class UploadListener implements TransferListener {

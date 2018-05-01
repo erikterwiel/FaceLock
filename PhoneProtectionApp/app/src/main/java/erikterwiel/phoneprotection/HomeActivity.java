@@ -91,6 +91,7 @@ public class HomeActivity extends AppCompatActivity {
 
         DynamoDB.init(this);
         S3.init(this);
+        Rekognition.init(this);
         mMapper = DynamoDB.getInstance().getMapper();
         mS3Client = S3.getInstance().getS3Client();
         mTransferUtility = S3.getInstance().getTransferUtility();

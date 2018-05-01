@@ -19,7 +19,6 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
@@ -37,7 +36,6 @@ import com.amazonaws.services.rekognition.model.DetectLabelsResult;
 import com.amazonaws.services.rekognition.model.Image;
 import com.amazonaws.services.rekognition.model.Label;
 import com.amazonaws.services.rekognition.model.S3Object;
-import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.model.PublishRequest;
 import com.amazonaws.util.IOUtils;
@@ -56,8 +54,6 @@ import java.util.UUID;
 public class DetectionService extends Service {
 
     private static final String TAG = "DetectionService.java";
-    private static final String POOL_ID_UNAUTH = "us-east-1:d2040261-6a0f-4cba-af96-8ead1b66ec38";
-    private static final String POOL_REGION = "us-east-1";
     private static final String PATH_STREAM = "sdcard/Pictures/PhoneProtection/Stream";
     private static final String BUCKET_NAME = "phoneprotectionpictures";
     private static final float CONFIDENCE_THRESHOLD = 70F;  
@@ -75,7 +71,6 @@ public class DetectionService extends Service {
     private AWSCredentialsProvider mCredentialsProvider;
     private AmazonRekognitionClient mRekognition;
     private TransferUtility mTransferUtility;
-    private AmazonS3Client mS3Client;
     private SurfaceTexture mSurfaceTexture;
     private String mUsername;
     private Intent mIntent;
@@ -140,12 +135,8 @@ public class DetectionService extends Service {
 
         mSurfaceTexture = new SurfaceTexture(0);
 
-        mTransferUtility = getTransferUtility(this);
-        mCredentialsProvider = new CognitoCachingCredentialsProvider(
-                getApplicationContext(),
-                POOL_ID_UNAUTH,
-                Regions.fromName(POOL_REGION));
-        mRekognition = new AmazonRekognitionClient(mCredentialsProvider);
+        mTransferUtility = S3.getInstance().getTransferUtility();
+        mRekognition = Rekognition.getInstance().getRekognitionClient();
         enableProtection();
         return START_STICKY;
     }
@@ -341,26 +332,6 @@ public class DetectionService extends Service {
 
         // Shutdown service
         onDestroy();
-    }
-
-    public TransferUtility getTransferUtility(Context context) {
-        mS3Client = getS3Client(context.getApplicationContext());
-        TransferUtility sTransferUtility = new TransferUtility(
-                mS3Client, context.getApplicationContext());
-        return sTransferUtility;
-    }
-
-    public static AmazonS3Client getS3Client(Context context) {
-        AmazonS3Client sS3Client = new AmazonS3Client(getCredProvider(context.getApplicationContext()));
-        return sS3Client;
-    }
-
-    private static CognitoCachingCredentialsProvider getCredProvider(Context context) {
-        CognitoCachingCredentialsProvider sCredProvider = new CognitoCachingCredentialsProvider(
-                context.getApplicationContext(),
-                POOL_ID_UNAUTH,
-                Regions.fromName(POOL_REGION));
-        return sCredProvider;
     }
 
     private class UploadListener implements TransferListener {
