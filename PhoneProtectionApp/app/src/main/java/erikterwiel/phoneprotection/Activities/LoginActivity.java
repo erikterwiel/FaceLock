@@ -1,4 +1,4 @@
-package erikterwiel.phoneprotection;
+package erikterwiel.phoneprotection.Activities;
 
 import android.Manifest;
 import android.app.admin.DevicePolicyManager;
@@ -28,9 +28,12 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.Authentic
 
 import java.util.List;
 
-import static erikterwiel.phoneprotection.CognitoKeys.POOL_ID;
-import static erikterwiel.phoneprotection.CognitoKeys.CLIENT_ID;
-import static erikterwiel.phoneprotection.CognitoKeys.CLIENT_SECRET;
+import erikterwiel.phoneprotection.MyAdminReceiver;
+import erikterwiel.phoneprotection.R;
+
+import static erikterwiel.phoneprotection.Keys.CognitoKeys.POOL_ID;
+import static erikterwiel.phoneprotection.Keys.CognitoKeys.CLIENT_ID;
+import static erikterwiel.phoneprotection.Keys.CognitoKeys.CLIENT_SECRET;
 
 public class LoginActivity extends AppCompatActivity {
 

@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import erikterwiel.phoneprotection.Services.SirenService;
+
 public class UnlockReceiver extends BroadcastReceiver {
 
     private static final String TAG = "UnlockerReceiver.java";

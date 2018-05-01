@@ -1,4 +1,4 @@
-package erikterwiel.phoneprotection;
+package erikterwiel.phoneprotection.Activities;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -17,9 +17,11 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserCodeDel
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserPool;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.SignUpHandler;
 
-import static erikterwiel.phoneprotection.CognitoKeys.CLIENT_ID;
-import static erikterwiel.phoneprotection.CognitoKeys.CLIENT_SECRET;
-import static erikterwiel.phoneprotection.CognitoKeys.POOL_ID;
+import erikterwiel.phoneprotection.R;
+
+import static erikterwiel.phoneprotection.Keys.CognitoKeys.CLIENT_ID;
+import static erikterwiel.phoneprotection.Keys.CognitoKeys.CLIENT_SECRET;
+import static erikterwiel.phoneprotection.Keys.CognitoKeys.POOL_ID;
 
 public class RegisterActivity extends AppCompatActivity {
 

@@ -1,4 +1,4 @@
-package erikterwiel.phoneprotection;
+package erikterwiel.phoneprotection.Activities;
 
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -21,6 +21,9 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 
 import java.io.File;
+
+import erikterwiel.phoneprotection.R;
+import erikterwiel.phoneprotection.Singletons.S3;
 
 public class AddUserActivity extends AppCompatActivity {
 

@@ -1,4 +1,4 @@
-package erikterwiel.phoneprotection;
+package erikterwiel.phoneprotection.Activities;
 
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
@@ -13,8 +13,12 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 
-import static erikterwiel.phoneprotection.DynamoDBKeys.POOL_ID_UNAUTH;
-import static erikterwiel.phoneprotection.DynamoDBKeys.POOL_REGION;
+import erikterwiel.phoneprotection.R;
+import erikterwiel.phoneprotection.Singletons.S3;
+import erikterwiel.phoneprotection.Username;
+
+import static erikterwiel.phoneprotection.Keys.DynamoDBKeys.POOL_ID_UNAUTH;
+import static erikterwiel.phoneprotection.Keys.DynamoDBKeys.POOL_REGION;
 
 public class AddPhoneActivity extends AppCompatActivity {
 

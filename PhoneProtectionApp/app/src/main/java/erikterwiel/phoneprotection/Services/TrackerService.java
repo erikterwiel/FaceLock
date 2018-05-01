@@ -1,4 +1,4 @@
-package erikterwiel.phoneprotection;
+package erikterwiel.phoneprotection.Services;
 
 
 import android.app.Notification;
@@ -25,6 +25,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import erikterwiel.phoneprotection.R;
+import erikterwiel.phoneprotection.Username;
 
 public class TrackerService extends Service {
 

@@ -1,4 +1,4 @@
-package erikterwiel.phoneprotection;
+package erikterwiel.phoneprotection.Singletons;
 
 import android.content.Context;
 
@@ -7,10 +7,10 @@ import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 
-import static erikterwiel.phoneprotection.DynamoDBKeys.POOL_ID_UNAUTH;
-import static erikterwiel.phoneprotection.DynamoDBKeys.POOL_REGION;
+import static erikterwiel.phoneprotection.Keys.DynamoDBKeys.POOL_ID_UNAUTH;
+import static erikterwiel.phoneprotection.Keys.DynamoDBKeys.POOL_REGION;
 
-class DynamoDB {
+public class DynamoDB {
 
     private static DynamoDB instance;
     private DynamoDBMapper mapper;

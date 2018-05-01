@@ -24,7 +24,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".LoginActivity"
+            android:name=".Activities.LoginActivity"
             android:label="@string/login_label"
             android:theme="@style/splash_screen">
             <intent-filter>
@@ -34,13 +34,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".RegisterActivity"
+            android:name=".Activities.RegisterActivity"
             android:label="@string/register_label" />
         <activity
-            android:name=".HomeActivity"
+            android:name=".Activities.HomeActivity"
             android:label="@string/home_label" />
         <activity
-            android:name=".AddUserActivity"
+            android:name=".Activities.AddUserActivity"
             android:label="@string/add_label" />
 
         <receiver
@@ -59,10 +59,10 @@
             android:name="com.amazonaws.mobileconnectors.s3.transferutility.TransferService"
             android:enabled="true" />
         <service
-            android:name=".DetectionService"
+            android:name=".Services.DetectionService"
             android:enabled="true" />
         <service
-            android:name=".TrackerService"
+            android:name=".Services.TrackerService"
             android:enabled="true" />
 
         <provider
@@ -76,14 +76,14 @@
         </provider>
 
         <activity
-            android:name=".AddPhoneActivity"
+            android:name=".Activities.AddPhoneActivity"
             android:label="@string/phone_label"></activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name=".Activities.SettingsActivity"
             android:label="@string/settings_label" />
 
         <service
-            android:name=".SirenService"
+            android:name=".Services.SirenService"
             android:enabled="true" />
 
     </application>

@@ -1,13 +1,11 @@
-package erikterwiel.phoneprotection;
+package erikterwiel.phoneprotection.Activities;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.AsyncTask;
-import android.provider.Settings;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -28,29 +26,29 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static erikterwiel.phoneprotection.DynamoDBKeys.POOL_ID_UNAUTH;
-import static erikterwiel.phoneprotection.DynamoDBKeys.POOL_REGION;
+import erikterwiel.phoneprotection.Services.DetectionService;
+import erikterwiel.phoneprotection.R;
+import erikterwiel.phoneprotection.Singletons.DynamoDB;
+import erikterwiel.phoneprotection.Singletons.Rekognition;
+import erikterwiel.phoneprotection.Singletons.S3;
+import erikterwiel.phoneprotection.User;
+import erikterwiel.phoneprotection.Username;
 
 public class HomeActivity extends AppCompatActivity {
 

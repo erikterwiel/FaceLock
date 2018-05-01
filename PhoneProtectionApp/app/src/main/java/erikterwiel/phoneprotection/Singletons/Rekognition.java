@@ -1,4 +1,4 @@
-package erikterwiel.phoneprotection;
+package erikterwiel.phoneprotection.Singletons;
 
 import android.content.Context;
 
@@ -7,10 +7,10 @@ import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.rekognition.AmazonRekognitionClient;
 
-import static erikterwiel.phoneprotection.DynamoDBKeys.POOL_ID_UNAUTH;
-import static erikterwiel.phoneprotection.DynamoDBKeys.POOL_REGION;
+import static erikterwiel.phoneprotection.Keys.DynamoDBKeys.POOL_ID_UNAUTH;
+import static erikterwiel.phoneprotection.Keys.DynamoDBKeys.POOL_REGION;
 
-class Rekognition {
+public class Rekognition {
 
     private static Rekognition instance;
     private AmazonRekognitionClient rekognitionClient;

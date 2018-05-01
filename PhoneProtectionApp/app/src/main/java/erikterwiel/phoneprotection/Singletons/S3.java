@@ -1,4 +1,4 @@
-package erikterwiel.phoneprotection;
+package erikterwiel.phoneprotection.Singletons;
 
 import android.content.Context;
 
@@ -8,10 +8,10 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3Client;
 
-import static erikterwiel.phoneprotection.DynamoDBKeys.POOL_ID_UNAUTH;
-import static erikterwiel.phoneprotection.DynamoDBKeys.POOL_REGION;
+import static erikterwiel.phoneprotection.Keys.DynamoDBKeys.POOL_ID_UNAUTH;
+import static erikterwiel.phoneprotection.Keys.DynamoDBKeys.POOL_REGION;
 
-class S3 {
+public class S3 {
 
     private static S3 instance;
     private AmazonS3Client s3Client;

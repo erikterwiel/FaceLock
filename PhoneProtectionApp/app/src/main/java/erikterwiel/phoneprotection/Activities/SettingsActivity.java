@@ -1,4 +1,4 @@
-package erikterwiel.phoneprotection;
+package erikterwiel.phoneprotection.Activities;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -12,6 +12,8 @@ import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import erikterwiel.phoneprotection.R;
 
 public class SettingsActivity extends AppCompatActivity {
 

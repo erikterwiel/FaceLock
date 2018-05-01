@@ -1,4 +1,4 @@
-package erikterwiel.phoneprotection;
+package erikterwiel.phoneprotection.Services;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -50,6 +50,11 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
+
+import erikterwiel.phoneprotection.MyAdminReceiver;
+import erikterwiel.phoneprotection.R;
+import erikterwiel.phoneprotection.Singletons.Rekognition;
+import erikterwiel.phoneprotection.Singletons.S3;
 
 public class DetectionService extends Service {
 
