@@ -56,15 +56,12 @@ public class AddUserActivity extends AppCompatActivity {
         mImage = (ImageView) findViewById(R.id.add_image);
         mAdd = (Button) findViewById(R.id.add_add);
 
-        mAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!mName.getText().toString().equals("")) {
-                    beginCamera();
-                } else {
-                    Toast.makeText(AddUserActivity.this,
-                            "Please enter a user name", Toast.LENGTH_LONG).show();
-                }
+        mAdd.setOnClickListener(view -> {
+            if (!mName.getText().toString().equals("")) {
+                beginCamera();
+            } else {
+                Toast.makeText(AddUserActivity.this,
+                        "Please enter a user name", Toast.LENGTH_LONG).show();
             }
         });
     }

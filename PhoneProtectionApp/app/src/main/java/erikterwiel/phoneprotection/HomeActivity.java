@@ -101,14 +101,14 @@ public class HomeActivity extends AppCompatActivity {
         new DownloadPhone().execute();
         new DownloadUsers().execute();
 
-        mCoordinator = (CoordinatorLayout) findViewById(R.id.home_coordinator);
-        mLoading = (LinearLayout) findViewById(R.id.home_loading_users);
-        mName = (TextView) findViewById(R.id.home_name);
-        mLatitude = (TextView) findViewById(R.id.home_latitude);
-        mLongitude = (TextView) findViewById(R.id.home_longitude);
-        mStart = (Button) findViewById(R.id.home_start);
-        mStop = (Button) findViewById(R.id.home_stop);
-        mAdd = (FloatingActionButton) findViewById(R.id.home_add);
+        mCoordinator = findViewById(R.id.home_coordinator);
+        mLoading = findViewById(R.id.home_loading_users);
+        mName = findViewById(R.id.home_name);
+        mLatitude = findViewById(R.id.home_latitude);
+        mLongitude = findViewById(R.id.home_longitude);
+        mStart = findViewById(R.id.home_start);
+        mStop = findViewById(R.id.home_stop);
+        mAdd = findViewById(R.id.home_add);
 
         mStart.setOnClickListener(view -> {
             mDetectionIntent.putExtra("size", mUserList.size());
@@ -359,7 +359,7 @@ public class HomeActivity extends AppCompatActivity {
         params.height = 0;
         mLoading.setVisibility(View.INVISIBLE);
         mLoading.setLayoutParams(params);
-        mUsers = (RecyclerView) findViewById(R.id.home_users);
+        mUsers = findViewById(R.id.home_users);
         mUsers.setLayoutManager(new LinearLayoutManager(this));
         mUserAdapter = new UserAdapter(mUserList);
         mUsers.setAdapter(mUserAdapter);
@@ -419,8 +419,8 @@ public class HomeActivity extends AppCompatActivity {
 
         public UserHolder(View itemView) {
             super(itemView);
-            mImage = (ImageView) itemView.findViewById(R.id.user_image);
-            mName = (TextView) itemView.findViewById(R.id.user_name);
+            mImage = itemView.findViewById(R.id.user_image);
+            mName = itemView.findViewById(R.id.user_name);
         }
 
         public void bindUser(User user) {
