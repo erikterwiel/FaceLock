@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">Swiper No Swiping</string>
-    <string name="login_label">Swiper No Swiping</string>
+    <string name="app_name">Face Lock</string>
+    <string name="login_label">Face Lock</string>
     <string name="login_email">Email</string>
     <string name="login_password">Password</string>
     <string name="login_login">Sign In</string>

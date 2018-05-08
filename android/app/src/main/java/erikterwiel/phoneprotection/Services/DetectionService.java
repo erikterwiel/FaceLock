@@ -19,6 +19,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
@@ -56,6 +57,9 @@ import erikterwiel.phoneprotection.R;
 import erikterwiel.phoneprotection.Singletons.Rekognition;
 import erikterwiel.phoneprotection.Singletons.S3;
 
+import static erikterwiel.phoneprotection.Keys.DynamoDBKeys.POOL_ID_UNAUTH;
+import static erikterwiel.phoneprotection.Keys.DynamoDBKeys.POOL_REGION;
+
 public class DetectionService extends Service {
 
     private static final String TAG = "DetectionService.java";
@@ -84,6 +88,11 @@ public class DetectionService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand() called");
+
+        mCredentialsProvider = new CognitoCachingCredentialsProvider(
+                this,
+                POOL_ID_UNAUTH,
+                Regions.fromName(POOL_REGION));
 
         mDatabase = getSharedPreferences("settings", MODE_PRIVATE);
 
@@ -139,6 +148,7 @@ public class DetectionService extends Service {
         }
 
         mSurfaceTexture = new SurfaceTexture(0);
+
 
         mTransferUtility = S3.getInstance().getTransferUtility();
         mRekognition = Rekognition.getInstance().getRekognitionClient();
@@ -327,7 +337,7 @@ public class DetectionService extends Service {
         Intent trackerIntent = new Intent(this, TrackerService.class);
         trackerIntent.putExtra("username", mUsername);
         Log.i(TAG, "Passing " + mUsername + " to TrackerService");
-        startService(trackerIntent);
+//        startService(trackerIntent);
 
         // Lock down phone
         DevicePolicyManager deviceManager =
