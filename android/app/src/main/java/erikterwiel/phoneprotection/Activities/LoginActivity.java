@@ -47,6 +47,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText mPassword;
     private Button mLogin;
     private Button mRegister;
+    private Button mForgot;
     private SharedPreferences mMemory;
 
     @Override
@@ -92,6 +93,7 @@ public class LoginActivity extends AppCompatActivity {
         mPassword = findViewById(R.id.login_password);
         mLogin = findViewById(R.id.login_login);
         mRegister = findViewById(R.id.login_register);
+        mForgot = findViewById(R.id.login_forgot);
 
         mMemory = getSharedPreferences("memory", Context.MODE_PRIVATE);
         if (mMemory.contains("email")) {
@@ -156,6 +158,10 @@ public class LoginActivity extends AppCompatActivity {
         mRegister.setOnClickListener(view -> {
             Intent registerIntent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(registerIntent);
+        });
+
+        mForgot.setOnClickListener(view -> {
+            Toast.makeText(LoginActivity.this, "Check email for reset", Toast.LENGTH_LONG).show();
         });
     }
 

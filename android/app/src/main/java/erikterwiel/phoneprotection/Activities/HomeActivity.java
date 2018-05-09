@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -34,6 +33,7 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 
@@ -56,6 +56,7 @@ public class HomeActivity extends AppCompatActivity {
     private static final String BUCKET_NAME = "phoneprotectionpictures";
     private static final int REQUEST_PHONE = 102;
     private static final int REQUEST_ADD = 103;
+    private static final int REQUEST_EDIT = 104;
 
     private AmazonS3Client mS3Client;
     private TransferUtility mTransferUtility;
@@ -78,6 +79,7 @@ public class HomeActivity extends AppCompatActivity {
     private Button mStart;
     private Button mStop;
     private FloatingActionButton mAdd;
+    private FloatingActionButton mEdit;
     private int mPosition;
 
     @Override
@@ -106,7 +108,8 @@ public class HomeActivity extends AppCompatActivity {
         mLongitude = findViewById(R.id.home_longitude);
         mStart = findViewById(R.id.home_start);
         mStop = findViewById(R.id.home_stop);
-        mAdd = findViewById(R.id.home_add);
+        mAdd = findViewById(R.id.home_new_user);
+        mEdit = findViewById(R.id.home_edit_phone);
 
         mStart.setOnClickListener(view -> {
             mDetectionIntent.putExtra("size", mUserList.size());
@@ -129,6 +132,11 @@ public class HomeActivity extends AppCompatActivity {
             Intent addUserIntent = new Intent(HomeActivity.this, AddUserActivity.class);
             addUserIntent.putExtra("username", getIntent().getStringExtra("username"));
             startActivityForResult(addUserIntent, REQUEST_ADD);
+        });
+
+        mEdit.setOnClickListener(view -> {
+            Intent editPhoneIntent = new Intent(HomeActivity.this, EditUserActivity.class);
+            startActivityForResult(editPhoneIntent, REQUEST_EDIT);
         });
     }
 

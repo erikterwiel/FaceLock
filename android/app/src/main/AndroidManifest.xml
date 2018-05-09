@@ -77,7 +77,7 @@
 
         <activity
             android:name=".Activities.AddPhoneActivity"
-            android:label="@string/phone_label"></activity>
+            android:label="@string/phone_label" />
         <activity
             android:name=".Activities.SettingsActivity"
             android:label="@string/settings_label" />
@@ -86,6 +86,7 @@
             android:name=".Services.SirenService"
             android:enabled="true" />
 
+        <activity android:name=".Activities.EditUserActivity" />
     </application>
 
 </manifest>
