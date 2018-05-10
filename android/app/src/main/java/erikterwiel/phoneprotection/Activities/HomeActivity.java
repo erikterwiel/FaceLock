@@ -1,11 +1,14 @@
 package erikterwiel.phoneprotection.Activities;
 
+import android.app.AlarmManager;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.os.SystemClock;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -42,6 +45,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import erikterwiel.phoneprotection.Receivers.StartProtectionReceiver;
 import erikterwiel.phoneprotection.Services.DetectionService;
 import erikterwiel.phoneprotection.R;
 import erikterwiel.phoneprotection.Singletons.DynamoDB;
@@ -65,6 +69,7 @@ public class HomeActivity extends AppCompatActivity {
     private Username mPhone;
     private ArrayList<HashMap<String, Object>> mTransferRecordMaps = new ArrayList<>();
     private ArrayList<User> mUserList = new ArrayList<>();
+    private SharedPreferences mDatabase;
     private int mCompletedDownloads;
     private CoordinatorLayout mCoordinator;
     private RecyclerView mUsers;
@@ -99,6 +104,7 @@ public class HomeActivity extends AppCompatActivity {
         new DownloadPhone().execute();
         new DownloadUsers().execute();
 
+        mDatabase = getSharedPreferences("settings", MODE_PRIVATE);
         mDetectionIntent = new Intent(this, DetectionService.class);
 
         mCoordinator = findViewById(R.id.home_coordinator);
@@ -112,6 +118,13 @@ public class HomeActivity extends AppCompatActivity {
         mEdit = findViewById(R.id.home_edit_phone);
 
         mStart.setOnClickListener(view -> {
+            Intent receiverIntent = new Intent(HomeActivity.this, StartProtectionReceiver.class);
+            AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+            alarmManager.setInexactRepeating(
+                    AlarmManager.ELAPSED_REALTIME,
+                    SystemClock.elapsedRealtime() + mDatabase.getInt("scan_frequency", 60000),
+                    mDatabase.getInt("scan_frequency", 60000));
+
             mDetectionIntent.putExtra("size", mUserList.size());
             for (int i = 0; i < mUserList.size(); i++) {
                 mDetectionIntent.putExtra("user" + i, mUserList.get(i).getFileName());

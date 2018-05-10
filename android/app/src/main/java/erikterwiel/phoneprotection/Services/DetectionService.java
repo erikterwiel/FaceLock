@@ -152,14 +152,123 @@ public class DetectionService extends Service {
 
         mTransferUtility = S3.getInstance().getTransferUtility();
         mRekognition = Rekognition.getInstance().getRekognitionClient();
-        enableProtection();
+
+
+
+        // Captures picture and saves it
+        Camera camera = null;
+        Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
+        Camera.getCameraInfo(1, cameraInfo);
+        try {
+            camera = Camera.open(1);
+        } catch (RuntimeException e) {
+            Log.i(TAG, "Camera 1 not available");
+        }
+        try {
+            if (camera == null) {
+                Log.i(TAG, "Could not get camera instance");
+            } else {
+                try {
+                    camera.setPreviewTexture(mSurfaceTexture);
+                    camera.startPreview();
+                } catch (Exception e) {
+                    Log.i(TAG, "Could not set the surface preview texture");
+                }
+                camera.takePicture(null, null, new Camera.PictureCallback() {
+                    @Override
+                    public void onPictureTaken(byte[] bytes, Camera camera) {
+                        File folder = new File(PATH_STREAM);
+                        if (!folder.exists()) folder.mkdir();
+                        File file = new File(folder, "Stream.jpg");
+                        try {
+                            FileOutputStream fos = new FileOutputStream(file);
+                            fos.write(bytes);
+                            fos.close();
+                            Log.i(TAG, "Image saved");
+                        } catch (Exception e) {
+                            Log.i(TAG, "Image could not be saved");
+                        }
+                        camera.release();
+                    }
+                });
+            }
+        } catch (Exception e) {
+            camera.release();
+            e.printStackTrace();
+        }
+
+        // Compares captured and saved pictures to S3 database
+        boolean isFace = false;
+        boolean isUser = false;
+        try {
+            // Turns .jpg file to Amazon Image file
+            Thread.sleep(3000);
+            InputStream inputStream = new FileInputStream(PATH_STREAM + "/Stream.jpg");
+            ByteBuffer imageBytes = ByteBuffer.wrap(IOUtils.toByteArray(inputStream));
+            Image targetImage = new Image().withBytes(imageBytes);
+
+            // Checks if file contains a face
+            DetectLabelsRequest detectLabelsRequest = new DetectLabelsRequest()
+                    .withImage(targetImage)
+                    .withMinConfidence(CONFIDENCE_THRESHOLD);
+            DetectLabelsResult detectLabelsResult = mRekognition.detectLabels(detectLabelsRequest);
+            List<Label> labels = detectLabelsResult.getLabels();
+            for (int i = 0; i < labels.size(); i++) {
+                String label = labels.get(i).getName();
+                if (label.equals("People") || label.equals("Person") || label.equals("Human"))
+                    isFace = true;
+                Log.i(TAG, labels.get(i).getName() + ":" + labels.get(i).getConfidence().toString());
+            }
+
+            // Compares faces if above fail contains a face
+            if (isFace) {
+                for (int i = 0; i < mUserList.size(); i++) {
+                    String[] inputNameSplit = mBucketFiles.get(i).split("/");
+                    if (!inputNameSplit[1].equals("Faustin.jpg") &&
+                            !inputNameSplit[1].equals("Mansour.jpg")) {
+                        Log.i(TAG, "Attempting to compare faces");
+                        CompareFacesRequest compareFacesRequest = new CompareFacesRequest()
+                                .withSourceImage(new Image()
+                                        .withS3Object(new S3Object()
+                                                .withName(mBucketFiles.get(i))
+                                                .withBucket(BUCKET_NAME)))
+                                .withTargetImage(targetImage)
+                                .withSimilarityThreshold(CONFIDENCE_THRESHOLD);
+                        Log.i(TAG, "Comparing face to " + mBucketFiles.get(i) + " in " + BUCKET_NAME);
+                        CompareFacesResult compareFacesResult =
+                                mRekognition.compareFaces(compareFacesRequest);
+                        List<CompareFacesMatch> faceDetails = compareFacesResult.getFaceMatches();
+                        for (int j = 0; j < faceDetails.size(); j++) {
+                            ComparedFace face = faceDetails.get(j).getFace();
+                            BoundingBox position = face.getBoundingBox();
+                            Log.i(TAG, "Face at " + position.getLeft().toString()
+                                    + " " + position.getTop()
+                                    + " matches with " + face.getConfidence().toString()
+                                    + "% confidence.");
+                            isUser = true;
+                        }
+                        if (isUser) {
+                            disableProtection();
+                            break;
+                        }
+                    }
+                }
+                if (!isUser) lockDown();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+
+
+
+
         return START_STICKY;
     }
 
     private void enableProtection() {
         mNotificationManager.cancel(NOTIFICATION_PROTECTED);
         mNotificationManager.notify(NOTIFICATION_SCAN, mScanNotification);
-        Log.i(TAG, "enableProtection() called");
         if (mPauseTimer != null) {
             mPauseTimer.cancel();
             mPauseTimer.purge();
@@ -168,114 +277,8 @@ public class DetectionService extends Service {
         mScanTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                Log.i(TAG, "run() called");
-
-                // Captures picture and saves it
-                Camera camera = null;
-                Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
-                Camera.getCameraInfo(1, cameraInfo);
-                try {
-                    camera = Camera.open(1);
-                } catch (RuntimeException e) {
-                    Log.i(TAG, "Camera 1 not available");
-                }
-                try {
-                    if (camera == null) {
-                        Log.i(TAG, "Could not get camera instance");
-                    } else {
-                        try {
-                            camera.setPreviewTexture(mSurfaceTexture);
-                            camera.startPreview();
-                        } catch (Exception e) {
-                            Log.i(TAG, "Could not set the surface preview texture");
-                        }
-                        camera.takePicture(null, null, new Camera.PictureCallback() {
-                            @Override
-                            public void onPictureTaken(byte[] bytes, Camera camera) {
-                                File folder = new File(PATH_STREAM);
-                                if (!folder.exists()) folder.mkdir();
-                                File file = new File(folder, "Stream.jpg");
-                                try {
-                                    FileOutputStream fos = new FileOutputStream(file);
-                                    fos.write(bytes);
-                                    fos.close();
-                                    Log.i(TAG, "Image saved");
-                                } catch (Exception e) {
-                                    Log.i(TAG, "Image could not be saved");
-                                }
-                                camera.release();
-                            }
-                        });
-                    }
-                } catch (Exception e) {
-                    camera.release();
-                    e.printStackTrace();
-                }
-
-                // Compares captured and saved pictures to S3 database
-                boolean isFace = false;
-                boolean isUser = false;
-                try {
-                    // Turns .jpg file to Amazon Image file
-                    Thread.sleep(3000);
-                    InputStream inputStream = new FileInputStream(PATH_STREAM + "/Stream.jpg");
-                    ByteBuffer imageBytes = ByteBuffer.wrap(IOUtils.toByteArray(inputStream));
-                    Image targetImage = new Image().withBytes(imageBytes);
-
-                    // Checks if file contains a face
-                    DetectLabelsRequest detectLabelsRequest = new DetectLabelsRequest()
-                            .withImage(targetImage)
-                            .withMinConfidence(CONFIDENCE_THRESHOLD);
-                    DetectLabelsResult detectLabelsResult = mRekognition.detectLabels(detectLabelsRequest);
-                    List<Label> labels = detectLabelsResult.getLabels();
-                    for (int i = 0; i < labels.size(); i++) {
-                        String label = labels.get(i).getName();
-                        if (label.equals("People") || label.equals("Person") || label.equals("Human"))
-                            isFace = true;
-                        Log.i(TAG, labels.get(i).getName() + ":" + labels.get(i).getConfidence().toString());
-                    }
-
-                    // Compares faces if above fail contains a face
-                    if (isFace) {
-                        for (int i = 0; i < mUserList.size(); i++) {
-                            String[] inputNameSplit = mBucketFiles.get(i).split("/");
-                            if (!inputNameSplit[1].equals("Faustin.jpg") &&
-                                    !inputNameSplit[1].equals("Mansour.jpg")) {
-                                Log.i(TAG, "Attempting to compare faces");
-                                CompareFacesRequest compareFacesRequest = new CompareFacesRequest()
-                                        .withSourceImage(new Image()
-                                                .withS3Object(new S3Object()
-                                                        .withName(mBucketFiles.get(i))
-                                                        .withBucket(BUCKET_NAME)))
-                                        .withTargetImage(targetImage)
-                                        .withSimilarityThreshold(CONFIDENCE_THRESHOLD);
-                                Log.i(TAG, "Comparing face to " + mBucketFiles.get(i) + " in " + BUCKET_NAME);
-                                CompareFacesResult compareFacesResult =
-                                        mRekognition.compareFaces(compareFacesRequest);
-                                List<CompareFacesMatch> faceDetails = compareFacesResult.getFaceMatches();
-                                for (int j = 0; j < faceDetails.size(); j++) {
-                                    ComparedFace face = faceDetails.get(j).getFace();
-                                    BoundingBox position = face.getBoundingBox();
-                                    Log.i(TAG, "Face at " + position.getLeft().toString()
-                                            + " " + position.getTop()
-                                            + " matches with " + face.getConfidence().toString()
-                                            + "% confidence.");
-                                    isUser = true;
-                                }
-                                if (isUser) {
-                                    disableProtection();
-                                    break;
-                                }
-                            }
-                        }
-                        if (!isUser) lockDown();
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
             }
         }, 0, mDatabase.getInt("scan_frequency", 60000));
-
     }
 
     private void disableProtection() {
