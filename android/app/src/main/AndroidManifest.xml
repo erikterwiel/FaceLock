@@ -87,6 +87,10 @@
             android:enabled="true" />
 
         <activity android:name=".Activities.EditUserActivity" />
+
+        <receiver
+            android:name=".Receivers.DetectionReceiver"
+            android:enabled="true" />
     </application>
 
 </manifest>

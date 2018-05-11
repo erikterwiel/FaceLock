@@ -1,6 +1,5 @@
 package erikterwiel.phoneprotection.Activities;
 
-import android.app.AlarmManager;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,11 +7,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.AsyncTask;
-import android.os.SystemClock;
+import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -45,10 +43,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import erikterwiel.phoneprotection.Receivers.StartProtectionReceiver;
-import erikterwiel.phoneprotection.Services.DetectionService;
 import erikterwiel.phoneprotection.R;
 import erikterwiel.phoneprotection.Singletons.DynamoDB;
+import erikterwiel.phoneprotection.Singletons.Protection;
 import erikterwiel.phoneprotection.Singletons.Rekognition;
 import erikterwiel.phoneprotection.Singletons.S3;
 import erikterwiel.phoneprotection.User;
@@ -69,13 +66,12 @@ public class HomeActivity extends AppCompatActivity {
     private Username mPhone;
     private ArrayList<HashMap<String, Object>> mTransferRecordMaps = new ArrayList<>();
     private ArrayList<User> mUserList = new ArrayList<>();
-    private SharedPreferences mDatabase;
     private int mCompletedDownloads;
     private CoordinatorLayout mCoordinator;
     private RecyclerView mUsers;
     private UserAdapter mUserAdapter;
     private Location mLocation;
-    private Intent mDetectionIntent;
+    private Protection mProtection;
     private MenuItem mSettings;
     private LinearLayout mLoading;
     private TextView mName;
@@ -97,15 +93,13 @@ public class HomeActivity extends AppCompatActivity {
         DynamoDB.init(this);
         S3.init(this);
         Rekognition.init(this);
+
         mMapper = DynamoDB.getInstance().getMapper();
         mS3Client = S3.getInstance().getS3Client();
         mTransferUtility = S3.getInstance().getTransferUtility();
 
         new DownloadPhone().execute();
         new DownloadUsers().execute();
-
-        mDatabase = getSharedPreferences("settings", MODE_PRIVATE);
-        mDetectionIntent = new Intent(this, DetectionService.class);
 
         mCoordinator = findViewById(R.id.home_coordinator);
         mLoading = findViewById(R.id.home_loading_users);
@@ -118,27 +112,13 @@ public class HomeActivity extends AppCompatActivity {
         mEdit = findViewById(R.id.home_edit_phone);
 
         mStart.setOnClickListener(view -> {
-            Intent receiverIntent = new Intent(HomeActivity.this, StartProtectionReceiver.class);
-            AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-            alarmManager.setInexactRepeating(
-                    AlarmManager.ELAPSED_REALTIME,
-                    SystemClock.elapsedRealtime() + mDatabase.getInt("scan_frequency", 60000),
-                    mDatabase.getInt("scan_frequency", 60000));
-
-            mDetectionIntent.putExtra("size", mUserList.size());
-            for (int i = 0; i < mUserList.size(); i++) {
-                mDetectionIntent.putExtra("user" + i, mUserList.get(i).getFileName());
-                mDetectionIntent.putExtra("bucketfiles" + i, mUserList.get(i).getName() + ".jpg");
-            }
-            mDetectionIntent.putExtra("username", getIntent().getStringExtra("username"));
+            mProtection.enableProtection();
             Snackbar.make(mCoordinator, "Protection enabled.", Snackbar.LENGTH_LONG).show();
-            Log.i(TAG, "Passing " + getIntent().getStringExtra("username") + " to DetectionService");
-            startService(mDetectionIntent);
         });
 
         mStop.setOnClickListener(view -> {
+            mProtection.disableProtection();
             Snackbar.make(mCoordinator, "Protection disabled.", Snackbar.LENGTH_LONG).show();
-            stopService(mDetectionIntent);
         });
 
         mAdd.setOnClickListener(view -> {
@@ -322,6 +302,8 @@ public class HomeActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Void result) {
+            Protection.init(HomeActivity.this, getIntent(), mUserList);
+            mProtection = Protection.getInstance();
             mDialog.dismiss();
         }
     }

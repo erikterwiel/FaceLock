@@ -1,9 +1,6 @@
 package erikterwiel.phoneprotection.Services;
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.Service;
+import android.app.IntentService;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -11,7 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
-import android.os.Build;
 import android.os.IBinder;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
@@ -48,96 +44,47 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.UUID;
 
 import erikterwiel.phoneprotection.MyAdminReceiver;
-import erikterwiel.phoneprotection.R;
+import erikterwiel.phoneprotection.Singletons.Protection;
 import erikterwiel.phoneprotection.Singletons.Rekognition;
 import erikterwiel.phoneprotection.Singletons.S3;
 
 import static erikterwiel.phoneprotection.Keys.DynamoDBKeys.POOL_ID_UNAUTH;
 import static erikterwiel.phoneprotection.Keys.DynamoDBKeys.POOL_REGION;
 
-public class DetectionService extends Service {
+public class DetectionService extends IntentService {
 
     private static final String TAG = "DetectionService.java";
     private static final String PATH_STREAM = "sdcard/Pictures/PhoneProtection/Stream";
     private static final String BUCKET_NAME = "phoneprotectionpictures";
-    private static final float CONFIDENCE_THRESHOLD = 70F;  
-    private static final int NOTIFICATION_SCAN = 104;
-    private static final int NOTIFICATION_PROTECTED = 106;
-    private static final String NOTIFICATION_CHANNEL = "105";
+    private static final float CONFIDENCE_THRESHOLD = 70F;
 
-    private NotificationManager mNotificationManager;
-    private Notification mScanNotification;
-    private Notification mProtectedNotification;
-    private Timer mScanTimer;
-    private Timer mPauseTimer;
     private ArrayList<String> mUserList = new ArrayList<>();
     private ArrayList<String> mBucketFiles = new ArrayList<>();
     private AWSCredentialsProvider mCredentialsProvider;
     private AmazonRekognitionClient mRekognition;
     private TransferUtility mTransferUtility;
-    private SurfaceTexture mSurfaceTexture;
     private String mUsername;
     private Intent mIntent;
     private SharedPreferences mDatabase;
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i(TAG, "onStartCommand() called");
+    public DetectionService() {
+        super("DetectionService");
+    }
 
+    @Override
+    public void onHandleIntent(Intent intent) {
+        Log.i(TAG, "onHandleIntent() called");
+
+        mDatabase = getSharedPreferences("settings", MODE_PRIVATE);
         mCredentialsProvider = new CognitoCachingCredentialsProvider(
                 this,
                 POOL_ID_UNAUTH,
                 Regions.fromName(POOL_REGION));
-
-        mDatabase = getSharedPreferences("settings", MODE_PRIVATE);
-
-        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL,
-                    "Swiper No Swiping Noficiation",
-                    NotificationManager.IMPORTANCE_LOW);
-            mNotificationManager.createNotificationChannel(channel);
-            Notification.Builder builder1 = new Notification.Builder(this, NOTIFICATION_CHANNEL);
-            builder1.setSmallIcon(R.drawable.ic_security_black_48dp);
-            builder1.setContentTitle("Protection Active");
-            builder1.setContentText("Currently monitoring phone users");
-            builder1.setCategory(Notification.CATEGORY_STATUS);
-            builder1.setAutoCancel(false);
-            builder1.setOngoing(true);
-            mScanNotification = builder1.build();
-            Notification.Builder builder2 = new Notification.Builder(this, NOTIFICATION_CHANNEL);
-            builder2.setSmallIcon(R.drawable.ic_check_black_48dp);
-            builder2.setContentTitle("Protection Active");
-            builder2.setContentText("Phone user identified as authorised");
-            builder2.setCategory(Notification.CATEGORY_STATUS);
-            builder2.setAutoCancel(false);
-            builder2.setOngoing(true);
-            mProtectedNotification = builder2.build();
-        } else {
-             mScanNotification = new Notification.Builder(this)
-                    .setSmallIcon(R.drawable.ic_security_black_48dp)
-                     .setContentTitle("Protection Active")
-                     .setContentText("Currently monitoring phone users")
-                     .setCategory(Notification.CATEGORY_STATUS)
-                    .setPriority(Notification.PRIORITY_LOW)
-                    .setAutoCancel(false)
-                    .setOngoing(true)
-                    .build();
-            mProtectedNotification = new Notification.Builder(this)
-                    .setSmallIcon(R.drawable.ic_check_black_48dp)
-                    .setContentTitle("Protection Active")
-                    .setContentText("Phone user identified as authorised")
-                    .setCategory(Notification.CATEGORY_STATUS)
-                    .setPriority(Notification.PRIORITY_LOW)
-                    .setAutoCancel(false)
-                    .setOngoing(true)
-                    .build();
-        }
+        mTransferUtility = S3.getInstance().getTransferUtility();
+        mRekognition = Rekognition.getInstance().getRekognitionClient();
 
         mIntent = intent;
         mUsername = intent.getStringExtra("username");
@@ -147,15 +94,8 @@ public class DetectionService extends Service {
             mBucketFiles.add(mUsername + "/" + intent.getStringExtra("bucketfiles" + i));
         }
 
-        mSurfaceTexture = new SurfaceTexture(0);
-
-
-        mTransferUtility = S3.getInstance().getTransferUtility();
-        mRekognition = Rekognition.getInstance().getRekognitionClient();
-
-
-
         // Captures picture and saves it
+        SurfaceTexture surfaceTexture = new SurfaceTexture(0);
         Camera camera = null;
         Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
         Camera.getCameraInfo(1, cameraInfo);
@@ -169,7 +109,7 @@ public class DetectionService extends Service {
                 Log.i(TAG, "Could not get camera instance");
             } else {
                 try {
-                    camera.setPreviewTexture(mSurfaceTexture);
+                    camera.setPreviewTexture(surfaceTexture);
                     camera.startPreview();
                 } catch (Exception e) {
                     Log.i(TAG, "Could not set the surface preview texture");
@@ -220,6 +160,8 @@ public class DetectionService extends Service {
                 Log.i(TAG, labels.get(i).getName() + ":" + labels.get(i).getConfidence().toString());
             }
 
+            Log.i(TAG, "asdfsdfasdfasdf");
+
             // Compares faces if above fail contains a face
             if (isFace) {
                 for (int i = 0; i < mUserList.size(); i++) {
@@ -248,7 +190,7 @@ public class DetectionService extends Service {
                             isUser = true;
                         }
                         if (isUser) {
-                            disableProtection();
+                            Protection.getInstance().pauseProtection();
                             break;
                         }
                     }
@@ -258,46 +200,6 @@ public class DetectionService extends Service {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
-
-
-
-
-        return START_STICKY;
-    }
-
-    private void enableProtection() {
-        mNotificationManager.cancel(NOTIFICATION_PROTECTED);
-        mNotificationManager.notify(NOTIFICATION_SCAN, mScanNotification);
-        if (mPauseTimer != null) {
-            mPauseTimer.cancel();
-            mPauseTimer.purge();
-        }
-        mScanTimer = new Timer();
-        mScanTimer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-            }
-        }, 0, mDatabase.getInt("scan_frequency", 60000));
-    }
-
-    private void disableProtection() {
-        Log.i(TAG, "disableProtection() called");
-        mNotificationManager.cancel(NOTIFICATION_SCAN);
-        mNotificationManager.notify(NOTIFICATION_PROTECTED, mProtectedNotification);
-        if (mScanTimer != null) {
-            mScanTimer.cancel();
-            mScanTimer.purge();
-        }
-
-        mPauseTimer = new Timer();
-        Log.i(TAG, "enableProtection() in " + (mDatabase.getInt("safe_duration", 900000)/1000 + "seconds"));
-        mPauseTimer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                enableProtection();
-            }
-        }, mDatabase.getInt("safe_duration", 900000), 7200000);
     }
 
     private void lockDown() {
@@ -349,7 +251,7 @@ public class DetectionService extends Service {
         if (deviceManager.isAdminActive(compName)) deviceManager.lockNow();
 
         // Shutdown service
-        onDestroy();
+        Protection.getInstance().disableProtection();
     }
 
     private class UploadListener implements TransferListener {
@@ -370,23 +272,6 @@ public class DetectionService extends Service {
             ex.printStackTrace();
             Log.i(TAG, "Error detected");
         }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.i(TAG, "onDestroy() called");
-        mNotificationManager.cancel(NOTIFICATION_SCAN);
-        mNotificationManager.cancel(NOTIFICATION_PROTECTED);
-        if (mScanTimer != null) {
-            mScanTimer.cancel();
-            mScanTimer.purge();
-        }
-        if (mPauseTimer != null) {
-            mPauseTimer.cancel();
-            mPauseTimer.purge();
-        }
-        stopForeground(true);
     }
 
     @Nullable
