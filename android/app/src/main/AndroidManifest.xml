@@ -91,6 +91,10 @@
         <receiver
             android:name=".Receivers.DetectionReceiver"
             android:enabled="true" />
+
+        <receiver
+            android:name=".Receivers.ResumeReceiver"
+            android:enabled="true"/>
     </application>
 
 </manifest>

@@ -78,6 +78,8 @@ public class DetectionService extends IntentService {
     public void onHandleIntent(Intent intent) {
         Log.i(TAG, "onHandleIntent() called");
 
+        Protection.getInstance().enableScanning();
+
         mDatabase = getSharedPreferences("settings", MODE_PRIVATE);
         mCredentialsProvider = new CognitoCachingCredentialsProvider(
                 this,
