@@ -182,7 +182,7 @@ public class HomeActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             mDialog = new ProgressDialog(HomeActivity.this, R.style.AppCompatAlertDialogStyle);
-            mDialog.setTitle(R.string.home_downloading);
+            mDialog.setTitle(R.string.home_downloading_phones);
             mDialog.setMessage("Please wait...");
             mDialog.show();
         }
@@ -276,7 +276,7 @@ public class HomeActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             mDialog = new ProgressDialog(HomeActivity.this, R.style.AppCompatAlertDialogStyle);
-            mDialog.setTitle(R.string.home_downloading);
+            mDialog.setTitle(R.string.home_downloading_users);
             mDialog.setMessage("Please wait...");
             mDialog.show();
         }

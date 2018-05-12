@@ -176,6 +176,7 @@ public class Protection {
     public void disableProtection() {
         Log.i(TAG, "disableProtection() called");
         mAlarmManager.cancel(mPendingDetectionIntent);
+        mAlarmManager.cancel(mPendingResumeIntent);
         mNotificationManager.cancel(NOTIFICATION_MONITORING);
         mNotificationManager.cancel(NOTIFICATION_SCANNING);
         mNotificationManager.cancel(NOTIFICATION_PROTECTED);

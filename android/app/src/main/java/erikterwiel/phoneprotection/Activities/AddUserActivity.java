@@ -22,6 +22,7 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 
 import java.io.File;
 
+import erikterwiel.phoneprotection.FileCompressor;
 import erikterwiel.phoneprotection.R;
 import erikterwiel.phoneprotection.Singletons.S3;
 
@@ -79,10 +80,11 @@ public class AddUserActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        File file = new File(mOutputPath);
+        FileCompressor fileCompressor = new FileCompressor();
+        File file = new File(fileCompressor.compressImage(mOutputPath, this));
         TransferObserver observer = mTransferUtility.upload(
                 BUCKET_NAME,
-                getIntent().getStringExtra("username") + "/" + file.getName(),
+                getIntent().getStringExtra("username") + "/" + mName.getText().toString() + ".jpg",
                 file);
         Log.i(TAG, "Uploading");
         observer.setTransferListener(new UploadListener());
