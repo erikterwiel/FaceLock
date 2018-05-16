@@ -91,10 +91,11 @@
         <receiver
             android:name=".Receivers.DetectionReceiver"
             android:enabled="true" />
-
         <receiver
             android:name=".Receivers.ResumeReceiver"
-            android:enabled="true"/>
+            android:enabled="true" />
+
+        <activity android:name=".Activities.ForgotActivity"></activity>
     </application>
 
 </manifest>

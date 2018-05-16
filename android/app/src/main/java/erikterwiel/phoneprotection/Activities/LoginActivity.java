@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -67,8 +68,11 @@ public class LoginActivity extends AppCompatActivity {
                         Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
                         Manifest.permission.CAMERA,
-                        Manifest.permission.ACCESS_NOTIFICATION_POLICY},
+                        Manifest.permission.READ_PHONE_STATE},
                 REQUEST_PERMISSION);
+
+
+        Log.i(TAG, "Unique ID: " + Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID));
 
         DevicePolicyManager devicePolicyManager =
                 (DevicePolicyManager) getSystemService(DEVICE_POLICY_SERVICE);

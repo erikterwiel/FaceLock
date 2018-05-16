@@ -2,7 +2,6 @@ package erikterwiel.phoneprotection.Services;
 
 
 import android.app.Notification;
-import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.Intent;
 import android.location.Location;
@@ -15,14 +14,10 @@ import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
-import com.amazonaws.services.s3.model.ObjectListing;
-import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -87,8 +82,8 @@ public class TrackerService extends Service {
                             if (location != null) {
                                 Log.i(TAG, "Latitude: " + location.getLatitude());
                                 Log.i(TAG, "Longitude: " + location.getLongitude());
-                                mPhone.setLatitude(location.getLatitude());
-                                mPhone.setLongitude(location.getLongitude());
+                                mPhone.setLatitudes(location.getLatitude());
+                                mPhone.setLongitudes(location.getLongitude());
                             }
                         }
                     });

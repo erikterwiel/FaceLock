@@ -75,3 +75,4 @@ fastlane/readme.md
 /android/captures
 .externalNativeBuild
 android/app/src/main/java/erikterwiel/phoneprotection/Keys/
+/web/node_modules/

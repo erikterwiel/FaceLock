@@ -11,6 +11,8 @@
     <string name="register_email">Email</string>
     <string name="register_password">Password</string>
     <string name="register_register">Register</string>
+    <string name="forgot_email">Email</string>
+    <string name="forgot_submit">Submit</string>
     <string name="phone_label">Add Phone</string>
     <string name="phone_uploading">Uploading</string>
     <string name="phone_wait">Please wait</string>

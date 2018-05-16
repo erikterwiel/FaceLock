@@ -8,9 +8,10 @@ import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBTable;
 public class Username {
 
     private String mUsername;
-    private String mName;
-    private double mLatitude;
-    private double mLongitude;
+    private String[] mUniques;
+    private String[] mNames;
+    private double[] mLatitudes;
+    private double[] mLongitudes;
 
     @DynamoDBHashKey(attributeName = "Username")
     public String getUsername() {
@@ -21,30 +22,39 @@ public class Username {
         mUsername = username;
     }
 
-    @DynamoDBAttribute (attributeName = "Name")
-    public String getName() {
-        return mName;
+    @DynamoDBAttribute(attributeName = "Unique")
+    public String[] getUniques() {
+        return mUniques;
     }
 
-    public void setName(String name) {
-        mName = name;
+    public void setUniques(String[] uniques) {
+        mUniques = uniques;
+    }
+
+    @DynamoDBAttribute (attributeName = "Name")
+    public String[] getNames() {
+        return mNames;
+    }
+
+    public void setNames(String[] names) {
+        mNames = names;
     }
 
     @DynamoDBAttribute (attributeName = "Latitude")
-    public double getLatitude() {
-        return mLatitude;
+    public double[] getLatitudes() {
+        return mLatitudes;
     }
 
-    public void setLatitude(double latitude) {
-        mLatitude = latitude;
+    public void setLatitudes(double[] latitudes) {
+        mLatitudes = latitudes;
     }
 
     @DynamoDBAttribute (attributeName = "Longitude")
-    public double getLongitude() {
-        return mLongitude;
+    public double[] getLongitudes() {
+        return mLongitudes;
     }
 
-    public void setLongitude(double longitude) {
-        mLongitude = longitude;
+    public void setLongitudes(double[] longitudes) {
+        mLongitudes = longitudes;
     }
 }

@@ -2,30 +2,24 @@ package erikterwiel.phoneprotection.Activities;
 
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 
 import erikterwiel.phoneprotection.R;
-import erikterwiel.phoneprotection.Singletons.S3;
+import erikterwiel.phoneprotection.Singletons.DynamoDB;
 import erikterwiel.phoneprotection.Username;
-
-import static erikterwiel.phoneprotection.Keys.DynamoDBKeys.POOL_ID_UNAUTH;
-import static erikterwiel.phoneprotection.Keys.DynamoDBKeys.POOL_REGION;
 
 public class AddPhoneActivity extends AppCompatActivity {
 
     private static final String TAG = "AddPhoneActivity.java";
 
-    private TransferUtility mTransferUtility;
-    private AmazonDynamoDBClient mDDBClient;
     private DynamoDBMapper mMapper;
     private EditText mName;
     private Button mAdd;
@@ -35,14 +29,7 @@ public class AddPhoneActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_phone);
 
-        mTransferUtility = S3.getInstance().getTransferUtility();
-        CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
-                getApplicationContext(),
-                POOL_ID_UNAUTH,
-                Regions.fromName(POOL_REGION));
-        mDDBClient = new AmazonDynamoDBClient(credentialsProvider);
-        mMapper = new DynamoDBMapper(mDDBClient);
-
+        mMapper = DynamoDB.getInstance().getMapper();
         mName = findViewById(R.id.phone_name);
         mAdd = findViewById(R.id.phone_add_phone);
 
@@ -63,9 +50,24 @@ public class AddPhoneActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... inputs) {
-            Username username = new Username();
-            username.setUsername(getIntent().getStringExtra("username"));
-            username.setName(mName.getText().toString());
+            Username username = mMapper.load(Username.class, getIntent().getStringExtra("username"));
+            if (username == null) {
+                username = new Username();
+                username.setUsername(getIntent().getStringExtra("username"));
+                String[] uniques = new String[1];
+                String[] phoneNames = new String[1];
+                uniques[0] = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+                phoneNames[0] = mName.getText().toString();
+                username.setNames(phoneNames);
+            } else {
+                String[] uniques = new String[username.getUniques().length];
+                String[] phoneNames = new String[username.getNames().length];
+                uniques[username.getUniques().length] = Settings.Secure.getString(
+                        getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+                phoneNames[username.getNames().length] = mName.getText().toString();
+                username.setUniques(uniques);
+                username.setNames(phoneNames);
+            }
             mMapper.save(username);
             finish();
             return null;

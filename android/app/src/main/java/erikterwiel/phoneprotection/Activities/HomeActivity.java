@@ -2,12 +2,12 @@ package erikterwiel.phoneprotection.Activities;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import erikterwiel.phoneprotection.Phone;
 import erikterwiel.phoneprotection.R;
 import erikterwiel.phoneprotection.Singletons.DynamoDB;
 import erikterwiel.phoneprotection.Singletons.Protection;
@@ -63,25 +64,26 @@ public class HomeActivity extends AppCompatActivity {
     private TransferUtility mTransferUtility;
     private DynamoDBMapper mMapper;
     private FusedLocationProviderClient mFusedLocationClient;
-    private Username mPhone;
+    private Username mAccount;
     private ArrayList<HashMap<String, Object>> mTransferRecordMaps = new ArrayList<>();
     private ArrayList<User> mUserList = new ArrayList<>();
+    private ArrayList<Phone> mPhoneList = new ArrayList<>();
     private int mCompletedDownloads;
     private CoordinatorLayout mCoordinator;
     private RecyclerView mUsers;
+    private RecyclerView mPhones;
     private UserAdapter mUserAdapter;
+    private PhoneAdapter mPhoneAdapter;
     private Location mLocation;
     private Protection mProtection;
     private MenuItem mSettings;
     private LinearLayout mLoading;
-    private TextView mName;
-    private TextView mLatitude;
-    private TextView mLongitude;
     private Button mStart;
     private Button mStop;
     private FloatingActionButton mAdd;
     private FloatingActionButton mEdit;
     private int mPosition;
+    private int mPhoneIndex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,9 +105,6 @@ public class HomeActivity extends AppCompatActivity {
 
         mCoordinator = findViewById(R.id.home_coordinator);
         mLoading = findViewById(R.id.home_loading_users);
-        mName = findViewById(R.id.home_name);
-        mLatitude = findViewById(R.id.home_latitude);
-        mLongitude = findViewById(R.id.home_longitude);
         mStart = findViewById(R.id.home_start);
         mStop = findViewById(R.id.home_stop);
         mAdd = findViewById(R.id.home_new_user);
@@ -189,22 +188,44 @@ public class HomeActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... inputs) {
-            mPhone = mMapper.load(Username.class, getIntent().getStringExtra("username"));
-            if (mPhone == null) {
+            boolean seen = false;
+            mAccount = mMapper.load(Username.class, getIntent().getStringExtra("username"));
+            if (mAccount == null) {
                 Intent addPhoneIntent = new Intent(HomeActivity.this, AddPhoneActivity.class);
                 addPhoneIntent.putExtra("username", getIntent().getStringExtra("username"));
                 startActivityForResult(addPhoneIntent, REQUEST_PHONE);
             } else {
-                mName.setText(mPhone.getName());
-                mLatitude.setText("Latitude: " + mPhone.getLatitude());
-                mLongitude.setText("Longitude: " + mPhone.getLongitude());
-                initLocation();
+                for (int i = 0; i < mAccount.getUniques().length; i++) {
+                    mPhoneList.add(new Phone(
+                            mAccount.getUniques()[i],
+                            mAccount.getNames()[i],
+                            mAccount.getLatitudes()[i],
+                            mAccount.getLongitudes()[i]));
+                    if (mAccount.getUniques()[i].equals(Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID))) {
+                        mPhoneIndex = i;
+                        seen = true;
+                    }
+                    if (i == mAccount.getUniques().length - 1) {
+                        if (!seen) {
+                            if (i == mAccount.getUniques().length - 1 && !seen) {
+                                Intent addPhoneIntent = new Intent(HomeActivity.this, AddPhoneActivity.class);
+                                addPhoneIntent.putExtra("username", getIntent().getStringExtra("username"));
+                                startActivityForResult(addPhoneIntent, REQUEST_PHONE);
+                            }
+                        }
+                        initLocation();
+                    }
+                }
             }
             return null;
         }
 
         @Override
         protected void onPostExecute(Void result) {
+            mPhones = findViewById(R.id.home_phones);
+            mPhones.setLayoutManager(new LinearLayoutManager(HomeActivity.this));
+            mPhoneAdapter = new PhoneAdapter(mPhoneList);
+            mPhones.setAdapter(mPhoneAdapter);
             mDialog.dismiss();
         }
     }
@@ -214,8 +235,6 @@ public class HomeActivity extends AppCompatActivity {
             mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
             mFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
                 if (location != null) {
-                    mLatitude.setText("Latitude: " + location.getLatitude());
-                    mLongitude.setText("Longitude: " + location.getLongitude());
                     mLocation = location;
                     new UpdatePhone().execute();
                 }
@@ -235,9 +254,13 @@ public class HomeActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            mPhone.setLatitude(mLocation.getLatitude());
-            mPhone.setLongitude(mLocation.getLongitude());
-            mMapper.save(mPhone);
+            double[] latitudeList = mAccount.getLatitudes();
+            double[] longitudeList = mAccount.getLongitudes();
+            latitudeList[mPhoneIndex] = mLocation.getLatitude();
+            longitudeList[mPhoneIndex] = mLocation.getLongitude();
+            mAccount.setLatitudes(latitudeList);
+            mAccount.setLongitudes(longitudeList);
+            mMapper.save(mAccount);
             return null;
         }
 
@@ -410,6 +433,53 @@ public class HomeActivity extends AppCompatActivity {
             mImage.setImageBitmap(Bitmap.createScaledBitmap(
                     mUser.getImage(),180, 240, false));
             mName.setText(mUser.getName());
+        }
+    }
+
+    private class PhoneAdapter extends RecyclerView.Adapter<PhoneHolder> {
+        private ArrayList<Phone> phoneList;
+
+        public PhoneAdapter(ArrayList<Phone> incomingList) {
+            phoneList = incomingList;
+        }
+
+        @Override
+        public PhoneHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            LayoutInflater layoutInflater = LayoutInflater.from(HomeActivity.this);
+            View view = layoutInflater.inflate(R.layout.item_phone, parent, false);
+            return new HomeActivity.PhoneHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(PhoneHolder holder, int position) {
+            Phone phone = phoneList.get(position);
+            holder.bindPhone(phone);
+        }
+
+        @Override
+        public int getItemCount() {
+            return phoneList.size();
+        }
+    }
+
+    private class PhoneHolder extends RecyclerView.ViewHolder {
+        private Phone mPhone;
+        private TextView mName;
+        private TextView mLatitude;
+        private TextView mLongitude;
+
+        public PhoneHolder(View itemView) {
+            super(itemView);
+            mName = itemView.findViewById(R.id.phone_name);
+            mLatitude = itemView.findViewById(R.id.phone_latitude);
+            mLongitude = itemView.findViewById(R.id.phone_longitude);
+        }
+
+        public void bindPhone(Phone phone) {
+            mPhone = phone;
+            mName.setText(mPhone.getName());
+            mLatitude.setText("Latitude: " + mPhone.getLatitude());
+            mLongitude.setText("Longitude: " + mPhone.getLongitude());
         }
     }
 
