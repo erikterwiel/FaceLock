@@ -1,0 +1,15 @@
+{
+  "name": "web",
+  "version": "2.0.0",
+  "description": "Face Lock Web App",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^2.6.1",
+    "express": "^4.16.3"
+  }
+}
