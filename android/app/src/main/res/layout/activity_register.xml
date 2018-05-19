@@ -3,31 +3,48 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="16dp"
-    android:orientation="vertical">
+    android:padding="16dp"
+    android:orientation="vertical"
+    android:background="@color/colorPrimary"
+    android:gravity="center_horizontal">
+    <ImageView
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:layout_margin="32dp"
+        android:src="@drawable/ic_logo"/>
     <EditText
         android:id="@+id/register_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:hint="@string/register_email"
-        android:textColor="@android:color/black"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        android:inputType="textEmailAddress"/>
+        android:inputType="textEmailAddress"
+        android:textColor="@android:color/white"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title" />
     <EditText
         android:id="@+id/register_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:hint="@string/register_password"
-        android:textColor="@android:color/black"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        android:inputType="textPassword"/>
-    <Button
-        android:id="@+id/register_register"
+        android:inputType="textPassword"
+        android:textColor="@android:color/white"
+        android:textAppearance="@style/password_text" />
+    <EditText
+        android:id="@+id/register_confirm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        android:textColor="@android:color/black"
+        android:layout_marginBottom="8dp"
+        android:hint="@string/register_confirm"
+        android:inputType="textPassword"
+        android:textColor="@android:color/white"
+        android:textAppearance="@style/password_text" />
+    <Button
+        android:id="@+id/register_register"
+        android:layout_width="256dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:background="@color/snsStatusBar"
+        android:textColor="@android:color/white"
         android:text="@string/register_register"/>
 </LinearLayout>

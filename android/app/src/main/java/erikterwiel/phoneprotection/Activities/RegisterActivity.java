@@ -31,6 +31,7 @@ public class RegisterActivity extends AppCompatActivity {
     private MenuItem mDone;
     private EditText mEmail;
     private EditText mPassword;
+    private EditText mConfirm;
     private Button mRegister;
 
     @Override
@@ -39,6 +40,7 @@ public class RegisterActivity extends AppCompatActivity {
         Log.i(TAG, "onCreate() called");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        getSupportActionBar().hide();
 
         ClientConfiguration clientConfiguration = new ClientConfiguration();
         mUserPool = new CognitoUserPool(
@@ -47,29 +49,36 @@ public class RegisterActivity extends AppCompatActivity {
         mEmail = findViewById(R.id.register_email);
         mPassword = findViewById(R.id.register_password);
         mRegister = findViewById(R.id.register_register);
+        mConfirm = findViewById(R.id.register_confirm);
 
         mRegister.setOnClickListener(view -> {
-            SignUpHandler signupCallback = new SignUpHandler() {
-                @Override
-                public void onSuccess(CognitoUser user, boolean signUpConfirmationState, CognitoUserCodeDeliveryDetails cognitoUserCodeDeliveryDetails) {
-                    Toast.makeText(RegisterActivity.this,
-                            "Registration successful, please check email for verification link.",
-                            Toast.LENGTH_LONG).show();
-                    finish();
-                }
+            if (mPassword.getText().toString().equals(mConfirm.getText().toString())) {
+                SignUpHandler signupCallback = new SignUpHandler() {
+                    @Override
+                    public void onSuccess(CognitoUser user, boolean signUpConfirmationState, CognitoUserCodeDeliveryDetails cognitoUserCodeDeliveryDetails) {
+                        Toast.makeText(RegisterActivity.this,
+                                "Registration successful, please check email for verification link.",
+                                Toast.LENGTH_LONG).show();
+                        finish();
+                    }
 
-                @Override
-                public void onFailure(Exception exception) {
-                    Toast.makeText(RegisterActivity.this,
-                            "Registration unsuccessful, please try again.",
-                            Toast.LENGTH_LONG).show();
-                    exception.printStackTrace();
-                }
-            };
-            CognitoUserAttributes userAttributes = new CognitoUserAttributes();
-            mUserPool.signUpInBackground(mEmail.getText().toString(),
-                    mPassword.getText().toString(),
-                    userAttributes, null, signupCallback);
+                    @Override
+                    public void onFailure(Exception exception) {
+                        Toast.makeText(RegisterActivity.this,
+                                exception.getClass().toString().split(" ")[1].split("\\.")[5],
+                                Toast.LENGTH_LONG).show();
+                    }
+                };
+                CognitoUserAttributes userAttributes = new CognitoUserAttributes();
+                mUserPool.signUpInBackground(mEmail.getText().toString(),
+                        mPassword.getText().toString(),
+                        userAttributes, null, signupCallback);
+            } else {
+                Toast.makeText(
+                        RegisterActivity.this,
+                        "Entered password does not match confirmation.",
+                        Toast.LENGTH_LONG).show();
+            }
         });
     }
 
