@@ -1,6 +1,7 @@
 package erikterwiel.phoneprotection.Activities;
 
 import android.app.ProgressDialog;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +10,8 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 
 import erikterwiel.phoneprotection.R;
 import erikterwiel.phoneprotection.Singletons.DynamoDB;
@@ -21,6 +24,7 @@ public class AddPhoneActivity extends AppCompatActivity {
     private DynamoDBMapper mMapper;
     private EditText mName;
     private Button mAdd;
+    private Location mLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +52,17 @@ public class AddPhoneActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... inputs) {
+            try {
+                FusedLocationProviderClient locationClient = LocationServices.getFusedLocationProviderClient(AddPhoneActivity.this);
+                locationClient.getLastLocation().addOnSuccessListener(AddPhoneActivity.this, location -> {
+                    if (location != null) {
+                        mLocation = location;
+                    }
+                });
+            } catch (SecurityException ex) {
+                ex.printStackTrace();
+            }
+
             Account account = mMapper.load(Account.class, getIntent().getStringExtra("username"));
             if (account == null) {
                 account = new Account();
@@ -55,8 +70,8 @@ public class AddPhoneActivity extends AppCompatActivity {
             }
             account.addUnique(Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID));
             account.addName(mName.getText().toString());
-            account.addLatitude(0.0);
-            account.addLongitude(0.0);
+            account.addLatitude(mLocation.getLatitude());
+            account.addLongitude(mLocation.getLongitude());
             mMapper.save(account);
             finish();
             return null;
