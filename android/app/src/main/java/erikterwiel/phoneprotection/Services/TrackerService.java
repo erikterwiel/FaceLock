@@ -4,7 +4,6 @@ package erikterwiel.phoneprotection.Services;
 import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
-import android.location.Location;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -16,13 +15,11 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.Timer;
-import java.util.TimerTask;
 
 import erikterwiel.phoneprotection.R;
-import erikterwiel.phoneprotection.Username;
+import erikterwiel.phoneprotection.Account;
 
 public class TrackerService extends Service {
 
@@ -35,7 +32,7 @@ public class TrackerService extends Service {
     private Notification mNotification;
     private FusedLocationProviderClient mFusedLocationClient;
     private Intent mIntent;
-    private Username mPhone;
+    private Account mPhone;
     private Timer mTimer;
     private int mRunCounter;
 
@@ -72,36 +69,36 @@ public class TrackerService extends Service {
         new UpdatePhone().execute();
 
         mTimer = new Timer();
-        mTimer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    mFusedLocationClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            if (location != null) {
-                                Log.i(TAG, "Latitude: " + location.getLatitude());
-                                Log.i(TAG, "Longitude: " + location.getLongitude());
-                                mPhone.setLatitudes(location.getLatitude());
-                                mPhone.setLongitudes(location.getLongitude());
-                            }
-                        }
-                    });
-                } catch (SecurityException ex) {
-                    ex.printStackTrace();
-                }
-                new UpdatePhone().execute();
-                mRunCounter += 1;
-                if (mRunCounter == 20) onDestroy();
-            }
-        }, 0, 15000);
+//        mTimer.scheduleAtFixedRate(new TimerTask() {
+//            @Override
+//            public void run() {
+//                try {
+//                    mFusedLocationClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+//                        @Override
+//                        public void onSuccess(Location location) {
+//                            if (location != null) {
+//                                Log.i(TAG, "Latitude: " + location.getLatitude());
+//                                Log.i(TAG, "Longitude: " + location.getLongitude());
+//                                mPhone.setLatitudes(location.getLatitude());
+//                                mPhone.setLongitudes(location.getLongitude());
+//                            }
+//                        }
+//                    });
+//                } catch (SecurityException ex) {
+//                    ex.printStackTrace();
+//                }
+//                new UpdatePhone().execute();
+//                mRunCounter += 1;
+//                if (mRunCounter == 20) onDestroy();
+//            }
+//        }, 0, 15000);
         return START_STICKY;
     }
 
     private class DownloadPhone extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... inputs) {
-            mPhone = mMapper.load(Username.class, mIntent.getStringExtra("username"));
+            mPhone = mMapper.load(Account.class, mIntent.getStringExtra("username"));
             return null;
         }
     }

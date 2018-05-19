@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import erikterwiel.phoneprotection.Account;
 import erikterwiel.phoneprotection.Phone;
 import erikterwiel.phoneprotection.R;
 import erikterwiel.phoneprotection.Singletons.DynamoDB;
@@ -50,7 +51,6 @@ import erikterwiel.phoneprotection.Singletons.Protection;
 import erikterwiel.phoneprotection.Singletons.Rekognition;
 import erikterwiel.phoneprotection.Singletons.S3;
 import erikterwiel.phoneprotection.User;
-import erikterwiel.phoneprotection.Username;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -64,7 +64,7 @@ public class HomeActivity extends AppCompatActivity {
     private TransferUtility mTransferUtility;
     private DynamoDBMapper mMapper;
     private FusedLocationProviderClient mFusedLocationClient;
-    private Username mAccount;
+    private Account mAccount;
     private ArrayList<HashMap<String, Object>> mTransferRecordMaps = new ArrayList<>();
     private ArrayList<User> mUserList = new ArrayList<>();
     private ArrayList<Phone> mPhoneList = new ArrayList<>();
@@ -189,29 +189,27 @@ public class HomeActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... inputs) {
             boolean seen = false;
-            mAccount = mMapper.load(Username.class, getIntent().getStringExtra("username"));
+            mAccount = mMapper.load(Account.class, getIntent().getStringExtra("username"));
             if (mAccount == null) {
                 Intent addPhoneIntent = new Intent(HomeActivity.this, AddPhoneActivity.class);
                 addPhoneIntent.putExtra("username", getIntent().getStringExtra("username"));
                 startActivityForResult(addPhoneIntent, REQUEST_PHONE);
             } else {
-                for (int i = 0; i < mAccount.getUniques().length; i++) {
+                for (int i = 0; i < mAccount.getUniques().size(); i++) {
                     mPhoneList.add(new Phone(
-                            mAccount.getUniques()[i],
-                            mAccount.getNames()[i],
-                            mAccount.getLatitudes()[i],
-                            mAccount.getLongitudes()[i]));
-                    if (mAccount.getUniques()[i].equals(Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID))) {
+                            mAccount.getUniques().get(i),
+                            mAccount.getNames().get(i),
+                            mAccount.getLatitudes().get(i),
+                            mAccount.getLongitudes().get(i)));
+                    if (mAccount.getUniques().get(i).equals(Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID))) {
                         mPhoneIndex = i;
                         seen = true;
                     }
-                    if (i == mAccount.getUniques().length - 1) {
+                    if (i == mAccount.getUniques().size() - 1) {
                         if (!seen) {
-                            if (i == mAccount.getUniques().length - 1 && !seen) {
-                                Intent addPhoneIntent = new Intent(HomeActivity.this, AddPhoneActivity.class);
-                                addPhoneIntent.putExtra("username", getIntent().getStringExtra("username"));
-                                startActivityForResult(addPhoneIntent, REQUEST_PHONE);
-                            }
+                            Intent addPhoneIntent = new Intent(HomeActivity.this, AddPhoneActivity.class);
+                            addPhoneIntent.putExtra("username", getIntent().getStringExtra("username"));
+                            startActivityForResult(addPhoneIntent, REQUEST_PHONE);
                         }
                         initLocation();
                     }
@@ -254,12 +252,8 @@ public class HomeActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            double[] latitudeList = mAccount.getLatitudes();
-            double[] longitudeList = mAccount.getLongitudes();
-            latitudeList[mPhoneIndex] = mLocation.getLatitude();
-            longitudeList[mPhoneIndex] = mLocation.getLongitude();
-            mAccount.setLatitudes(latitudeList);
-            mAccount.setLongitudes(longitudeList);
+            mAccount.replaceLatitude(mPhoneIndex, mLocation.getLatitude());
+            mAccount.replaceLongitude(mPhoneIndex, mLocation.getLongitude());
             mMapper.save(mAccount);
             return null;
         }

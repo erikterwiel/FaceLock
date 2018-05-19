@@ -9,12 +9,10 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 
 import erikterwiel.phoneprotection.R;
 import erikterwiel.phoneprotection.Singletons.DynamoDB;
-import erikterwiel.phoneprotection.Username;
+import erikterwiel.phoneprotection.Account;
 
 public class AddPhoneActivity extends AppCompatActivity {
 
@@ -50,25 +48,16 @@ public class AddPhoneActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... inputs) {
-            Username username = mMapper.load(Username.class, getIntent().getStringExtra("username"));
-            if (username == null) {
-                username = new Username();
-                username.setUsername(getIntent().getStringExtra("username"));
-                String[] uniques = new String[1];
-                String[] phoneNames = new String[1];
-                uniques[0] = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
-                phoneNames[0] = mName.getText().toString();
-                username.setNames(phoneNames);
-            } else {
-                String[] uniques = new String[username.getUniques().length];
-                String[] phoneNames = new String[username.getNames().length];
-                uniques[username.getUniques().length] = Settings.Secure.getString(
-                        getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
-                phoneNames[username.getNames().length] = mName.getText().toString();
-                username.setUniques(uniques);
-                username.setNames(phoneNames);
+            Account account = mMapper.load(Account.class, getIntent().getStringExtra("username"));
+            if (account == null) {
+                account = new Account();
+                account.setUsername(getIntent().getStringExtra("username"));
             }
-            mMapper.save(username);
+            account.addUnique(Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID));
+            account.addName(mName.getText().toString());
+            account.addLatitude(0.0);
+            account.addLongitude(0.0);
+            mMapper.save(account);
             finish();
             return null;
         }
