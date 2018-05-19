@@ -88,7 +88,7 @@ public class Protection {
             builder1.setOngoing(true);
             mMonitorNotification = builder1.build();
             Notification.Builder builder2 = new Notification.Builder(mContext, NOTIFICATION_CHANNEL);
-            builder2.setSmallIcon(R.drawable.ic_arrow_back_white_48dp);
+            builder2.setSmallIcon(R.drawable.baseline_sync_black_48dp);
             builder2.setContentTitle("Protection Active");
             builder2.setContentText("Processing current phone user's face");
             builder2.setCategory(Notification.CATEGORY_STATUS);
@@ -96,7 +96,7 @@ public class Protection {
             builder2.setOngoing(true);
             mScanNotification = builder2.build();
             Notification.Builder builder3 = new Notification.Builder(mContext, NOTIFICATION_CHANNEL);
-            builder3.setSmallIcon(R.drawable.ic_check_black_48dp);
+            builder3.setSmallIcon(R.drawable.baseline_verified_user_black_48dp);
             builder3.setContentTitle("Protection Active");
             builder3.setContentText("Phone user identified as authorised");
             builder3.setCategory(Notification.CATEGORY_STATUS);
@@ -114,7 +114,7 @@ public class Protection {
                     .setOngoing(true)
                     .build();
             mScanNotification = new Notification.Builder(mContext)
-                    .setSmallIcon(R.drawable.ic_arrow_back_white_48dp)
+                    .setSmallIcon(R.drawable.baseline_sync_black_48dp)
                     .setContentTitle("Protection Active")
                     .setContentText("Processing current phone user's face")
                     .setCategory(Notification.CATEGORY_STATUS)
@@ -123,7 +123,7 @@ public class Protection {
                     .setOngoing(true)
                     .build();
             mProtectedNotification = new Notification.Builder(mContext)
-                    .setSmallIcon(R.drawable.ic_check_black_48dp)
+                    .setSmallIcon(R.drawable.baseline_verified_user_black_48dp)
                     .setContentTitle("Protection Active")
                     .setContentText("Phone user identified as authorised")
                     .setCategory(Notification.CATEGORY_STATUS)
