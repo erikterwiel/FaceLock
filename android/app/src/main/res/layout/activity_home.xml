@@ -16,58 +16,65 @@
             android:orientation="vertical">
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:background="@android:color/white"
+                android:orientation="vertical">
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="16dp"
-                    android:background="@android:color/white"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="8dp"
                     android:text="@string/home_users"
                     android:textColor="@android:color/black"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
+                    android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
             </LinearLayout>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/home_users"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
             <LinearLayout
                 android:id="@+id/home_loading_users"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
+                android:layout_marginBottom="2dp"
                 android:layout_marginStart="4dp"
                 android:layout_marginEnd="4dp"
-                android:background="@android:color/white"
-                android:gravity="center_vertical"
-                android:visibility="visible">
+                android:background="@android:color/white">
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp"
-                    android:paddingTop="16dp"
-                    android:paddingBottom="16dp"
+                    android:layout_margin="8dp"
                     android:text="@string/home_loading_users"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                     android:textColor="@android:color/black"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Title" />
+                    android:visibility="visible" />
             </LinearLayout>
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/home_users"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:padding="16dp"
-                android:background="@android:color/white">
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="4dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:background="@android:color/white"
+                android:orientation="vertical">
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/home_phones"
                     android:textColor="@android:color/black"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
+                    android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
             </LinearLayout>
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/home_phones"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -78,7 +85,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
                     android:layout_marginEnd="2dp"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginBottom="4dp"
                     android:layout_weight="1"
                     android:background="@android:color/white"
                     android:textColor="@android:color/black"

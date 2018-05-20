@@ -19,13 +19,13 @@
     <string name="phone_wait">Please wait</string>
     <string name="phone_name">Phone name</string>
     <string name="phone_add_phone">Add Phone</string>
-    <string name="home_label">Swiper No Swiping</string>
+    <string name="home_label">Face Lock Home</string>
     <string name="home_downloading_phones">Downloading Phones</string>
     <string name="home_downloading_users">Downloading Users</string>
     <string name="home_wait">Please wait</string>
-    <string name="home_loading_users">Loading users please wait</string>
-    <string name="home_users">Users:</string>
-    <string name="home_phones">Phones:</string>
+    <string name="home_loading_users">Loading users please wait...</string>
+    <string name="home_users">Users</string>
+    <string name="home_phones">Phones</string>
     <string name="home_start">Enable Protection</string>
     <string name="home_stop">Disable Protection</string>
     <string name="home_settings">Settings</string>

@@ -375,7 +375,7 @@ public class HomeActivity extends AppCompatActivity {
         ViewGroup.LayoutParams params = mLoading.getLayoutParams();
         params.width = 0;
         params.height = 0;
-        mLoading.setVisibility(View.INVISIBLE);
+        mLoading.setVisibility(View.GONE);
         mLoading.setLayoutParams(params);
         mUsers = findViewById(R.id.home_users);
         mUsers.setLayoutManager(new LinearLayoutManager(this));
