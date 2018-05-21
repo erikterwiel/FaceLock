@@ -165,7 +165,8 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         mForgot.setOnClickListener(view -> {
-            Toast.makeText(LoginActivity.this, "Check email for reset", Toast.LENGTH_LONG).show();
+            Intent forgotIntent = new Intent(LoginActivity.this, ForgotActivity.class);
+            startActivity(forgotIntent);
         });
     }
 
