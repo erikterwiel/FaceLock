@@ -24,6 +24,8 @@ public class ForgotActivity extends AppCompatActivity {
 
     private EditText mEmail;
     private Button mSubmit;
+    private EditText mPassword;
+    private EditText mConfirm;
     private String mResult;
 
     @Override
@@ -33,7 +35,7 @@ public class ForgotActivity extends AppCompatActivity {
         getSupportActionBar().hide();
 
         mEmail = findViewById(R.id.forgot_email);
-        mSubmit = findViewById(R.id.forgot_submit);
+        mSubmit = findViewById(R.id.forgot_reset);
         mSubmit.setOnClickListener(view -> new ForgotPassword().execute());
     }
 
@@ -49,7 +51,8 @@ public class ForgotActivity extends AppCompatActivity {
                 public void onSuccess() {}
                 @Override
                 public void getResetCode(ForgotPasswordContinuation continuation) {
-                    mResult = "A link has been sent to your email to reset your password.";
+                    mResult = "A verification code has been sent to your email to reset your password.";
+
                 }
                 @Override
                 public void onFailure(Exception exception) {
