@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ import java.util.List;
 import erikterwiel.phoneprotection.MyAdminReceiver;
 import erikterwiel.phoneprotection.R;
 
+import static android.content.pm.PackageManager.PERMISSION_DENIED;
 import static erikterwiel.phoneprotection.Keys.CognitoKeys.POOL_ID;
 import static erikterwiel.phoneprotection.Keys.CognitoKeys.CLIENT_ID;
 import static erikterwiel.phoneprotection.Keys.CognitoKeys.CLIENT_SECRET;
@@ -44,6 +46,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private CognitoUserPool mUserPool;
     private CognitoUser mCognitoUser;
+    private CognitoUserSession mUserSession;
     private EditText mEmail;
     private EditText mPassword;
     private Button mLogin;
@@ -59,17 +62,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         getSupportActionBar().hide();
-
-        ActivityCompat.requestPermissions(
-                this,
-                new String[] {
-                        Manifest.permission.ACCESS_COARSE_LOCATION,
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        Manifest.permission.CAMERA,
-                        Manifest.permission.READ_PHONE_STATE},
-                REQUEST_PERMISSION);
 
 
         Log.i(TAG, "Unique ID: " + Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID));
@@ -113,13 +105,17 @@ public class LoginActivity extends AppCompatActivity {
             AuthenticationHandler handler = new AuthenticationHandler() {
                 @Override
                 public void onSuccess(CognitoUserSession userSession, CognitoDevice newDevice) {
-                    Toast.makeText(
+                    ActivityCompat.requestPermissions(
                             LoginActivity.this,
-                            "Authentication successful, loading...",
-                            Toast.LENGTH_SHORT).show();
-                    Intent homeIntent = new Intent(LoginActivity.this, HomeActivity.class);
-                    homeIntent.putExtra("username", userSession.getUsername());
-                    startActivity(homeIntent);
+                            new String[] {
+                                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                                    Manifest.permission.ACCESS_FINE_LOCATION,
+                                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                    Manifest.permission.CAMERA,
+                                    Manifest.permission.READ_PHONE_STATE},
+                            REQUEST_PERMISSION);
+                    mUserSession = userSession;
                 }
 
                 @Override
@@ -168,6 +164,26 @@ public class LoginActivity extends AppCompatActivity {
             Intent forgotIntent = new Intent(LoginActivity.this, ForgotActivity.class);
             startActivity(forgotIntent);
         });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        for (int i = 0; i < permissions.length; i++) {
+            if (!permissions[i].equals("android.permission.READ_PHONE_STATE") && grantResults[i] == PERMISSION_DENIED) {
+                Toast.makeText(
+                        LoginActivity.this,
+                        "You must allow all permissions to use Face Lock.",
+                        Toast.LENGTH_LONG).show();
+                return;
+            }
+        }
+        Toast.makeText(
+                LoginActivity.this,
+                "Authentication successful, loading...",
+                Toast.LENGTH_LONG).show();
+        Intent homeIntent = new Intent(LoginActivity.this, HomeActivity.class);
+        homeIntent.putExtra("username", mUserSession.getUsername());
+        startActivity(homeIntent);
     }
 
     @Override
