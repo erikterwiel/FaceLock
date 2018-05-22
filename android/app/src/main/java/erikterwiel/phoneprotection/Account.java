@@ -51,6 +51,10 @@ public class Account {
         mNames.add(name);
     }
 
+    public void replaceName(int index, String name) {
+        mNames.set(index, name);
+    }
+
     @DynamoDBAttribute (attributeName = "Latitude")
     public List<Double> getLatitudes() {
         return mLatitudes;

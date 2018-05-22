@@ -1,6 +1,5 @@
 package erikterwiel.phoneprotection.Activities;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -127,8 +126,9 @@ public class HomeActivity extends AppCompatActivity {
         });
 
         mEdit.setOnClickListener(view -> {
-            Intent editPhoneIntent = new Intent(HomeActivity.this, EditUserActivity.class);
-            startActivityForResult(editPhoneIntent, REQUEST_EDIT);
+            Intent editPhonesIntent = new Intent(HomeActivity.this, EditPhonesActivity.class);
+            editPhonesIntent.putExtra("username", getIntent().getStringExtra("username"));
+            startActivityForResult(editPhonesIntent, REQUEST_EDIT);
         });
     }
 
@@ -176,16 +176,6 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private class DownloadPhone extends AsyncTask<Void, Void, Void> {
-        private ProgressDialog mDialog;
-
-        @Override
-        protected void onPreExecute() {
-            mDialog = new ProgressDialog(HomeActivity.this, R.style.AppCompatAlertDialogStyle);
-            mDialog.setTitle(R.string.home_downloading_phones);
-            mDialog.setMessage("Please wait...");
-            mDialog.show();
-        }
-
         @Override
         protected Void doInBackground(Void... inputs) {
             boolean seen = false;
@@ -224,7 +214,6 @@ public class HomeActivity extends AppCompatActivity {
             mPhones.setLayoutManager(new LinearLayoutManager(HomeActivity.this));
             mPhoneAdapter = new PhoneAdapter(mPhoneList);
             mPhones.setAdapter(mPhoneAdapter);
-            mDialog.dismiss();
         }
     }
 
@@ -288,16 +277,6 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private class DownloadUsers extends AsyncTask<Void, Void, Void> {
-        private ProgressDialog mDialog;
-
-        @Override
-        protected void onPreExecute() {
-            mDialog = new ProgressDialog(HomeActivity.this, R.style.AppCompatAlertDialogStyle);
-            mDialog.setTitle(R.string.home_downloading_users);
-            mDialog.setMessage("Please wait...");
-            mDialog.show();
-        }
-
         @Override
         protected Void doInBackground(Void... inputs) {
             ObjectListing objectListing = mS3Client.listObjects(BUCKET_NAME);
@@ -321,7 +300,6 @@ public class HomeActivity extends AppCompatActivity {
         protected void onPostExecute(Void result) {
             Protection.init(HomeActivity.this, getIntent(), mUserList);
             mProtection = Protection.getInstance();
-            mDialog.dismiss();
         }
     }
 
@@ -476,5 +454,4 @@ public class HomeActivity extends AppCompatActivity {
             mLongitude.setText("Longitude: " + mPhone.getLongitude());
         }
     }
-
 }

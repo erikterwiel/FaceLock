@@ -86,7 +86,9 @@
             android:name=".Services.SirenService"
             android:enabled="true" />
 
-        <activity android:name=".Activities.EditUserActivity" />
+        <activity
+            android:name=".Activities.EditPhonesActivity"
+            android:label="@string/edit_label"/>
 
         <receiver
             android:name=".Receivers.DetectionReceiver"
@@ -95,7 +97,8 @@
             android:name=".Receivers.ResumeReceiver"
             android:enabled="true" />
 
-        <activity android:name=".Activities.ForgotActivity"></activity>
+        <activity
+            android:name=".Activities.ForgotActivity"/>
     </application>
 
 </manifest>
