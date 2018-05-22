@@ -183,6 +183,7 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.LENGTH_LONG).show();
         Intent homeIntent = new Intent(LoginActivity.this, HomeActivity.class);
         homeIntent.putExtra("username", mUserSession.getUsername());
+        homeIntent.putExtra("email", mEmail.getText().toString());
         startActivity(homeIntent);
     }
 

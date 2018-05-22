@@ -45,6 +45,7 @@ import java.util.List;
 import erikterwiel.phoneprotection.Account;
 import erikterwiel.phoneprotection.Phone;
 import erikterwiel.phoneprotection.R;
+import erikterwiel.phoneprotection.Services.DetectionService;
 import erikterwiel.phoneprotection.Singletons.DynamoDB;
 import erikterwiel.phoneprotection.Singletons.Protection;
 import erikterwiel.phoneprotection.Singletons.Rekognition;

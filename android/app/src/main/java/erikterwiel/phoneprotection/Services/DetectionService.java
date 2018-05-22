@@ -34,6 +34,7 @@ import com.amazonaws.services.rekognition.model.Image;
 import com.amazonaws.services.rekognition.model.Label;
 import com.amazonaws.services.rekognition.model.S3Object;
 import com.amazonaws.services.sns.AmazonSNSClient;
+import com.amazonaws.services.sns.model.GetTopicAttributesRequest;
 import com.amazonaws.services.sns.model.PublishRequest;
 import com.amazonaws.util.IOUtils;
 
@@ -54,6 +55,8 @@ import erikterwiel.phoneprotection.Singletons.S3;
 
 import static erikterwiel.phoneprotection.Keys.DynamoDBKeys.POOL_ID_UNAUTH;
 import static erikterwiel.phoneprotection.Keys.DynamoDBKeys.POOL_REGION;
+import static erikterwiel.phoneprotection.Keys.SNSKeys.ACCOUNT;
+import static erikterwiel.phoneprotection.Keys.SNSKeys.REGION;
 
 public class DetectionService extends IntentService {
 
@@ -230,13 +233,18 @@ public class DetectionService extends IntentService {
         // Emails and texts owner of phone
         AmazonSNSClient snsClient = new AmazonSNSClient(mCredentialsProvider);
         snsClient.setRegion(Region.getRegion(Regions.US_EAST_1));
-        String msg = "Swiper No Swiping has identified this individual using your phone.\n" +
+        String topicName = mIntent.getStringExtra("email");
+        topicName = topicName.replaceAll("\\.", "");
+        topicName = topicName.replaceAll("@", "");
+        topicName = topicName.replaceAll(":", "");
+        String msg = "Face Lock has identified this individual using your phone.\n" +
                 "https://s3.amazonaws.com/phoneprotectionpictures/" +
                 mUsername + "/Intruder/" + randomID + ".jpg\n\n" +
-                "Go to http://swipernoswiping.com/ to locate your phone";
+                "Go to http://facelock.co/ to locate your phone";
         String subject = "URGENT: Someone Has Your Phone";
         PublishRequest publishRequest = new PublishRequest(
-                "arn:aws:sns:us-east-1:132885165810:email-list", msg, subject);
+                "arn:aws:sns:" + REGION + ":" + ACCOUNT + ":" + topicName,
+                msg, subject);
         snsClient.publish(publishRequest);
 
         // Starts rapid location services

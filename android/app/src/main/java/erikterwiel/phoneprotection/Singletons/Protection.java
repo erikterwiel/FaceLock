@@ -60,6 +60,7 @@ public class Protection {
             detectionIntent.putExtra("bucketfiles" + i, mUserList.get(i).getName() + ".jpg");
         }
         detectionIntent.putExtra("username", mIntent.getStringExtra("username"));
+        detectionIntent.putExtra("email", mIntent.getStringExtra("email"));
         Log.i(TAG, "Passing " + mIntent.getStringExtra("username") + " to DetectionService");
         mPendingDetectionIntent = PendingIntent.getBroadcast(
                 mContext,
