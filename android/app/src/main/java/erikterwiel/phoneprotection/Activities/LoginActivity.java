@@ -101,6 +101,8 @@ public class LoginActivity extends AppCompatActivity {
         mUserPool = new CognitoUserPool(
                 this, POOL_ID, CLIENT_ID, CLIENT_SECRET, clientConfiguration);
         mLogin.setOnClickListener(view -> {
+            mEmail.setFocusable(false);
+            mLogin.setEnabled(false);
             mCognitoUser = mUserPool.getUser();
             AuthenticationHandler handler = new AuthenticationHandler() {
                 @Override
@@ -120,6 +122,8 @@ public class LoginActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Exception exception) {
+                    mEmail.setFocusable(true);
+                    mLogin.setEnabled(true);
                     Toast.makeText(
                             LoginActivity.this,
                             exception.getMessage().split("\\(")[0],
@@ -177,6 +181,8 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
         }
+        mEmail.setFocusable(true);
+        mLogin.setEnabled(true);
         Toast.makeText(
                 LoginActivity.this,
                 "Authentication successful, loading...",

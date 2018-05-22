@@ -119,6 +119,10 @@ public class RegisterActivity extends AppCompatActivity {
         }
         @Override
         protected void onPostExecute(Void result) {
+            mEmail.setFocusable(true);
+            mPassword.setFocusable(true);
+            mConfirm.setFocusable(true);
+            mRegister.setEnabled(true);
             Toast.makeText(RegisterActivity.this,
                     "Registration successful, please check email for two verification links. " +
                             "One is to verify your email, the other is receive pictures of phone intruders",
