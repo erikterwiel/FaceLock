@@ -14,8 +14,9 @@
     <string name="register_register">Sign Up</string>
     <string name="forgot_email">Email</string>
     <string name="forgot_reset">Reset Password</string>
-    <string name="forgot_password">Password</string>
-    <string name="forgot_confirm">Confirm Password</string>
+    <string name="forgot_hint">*</string>
+    <string name="forgot_password">New Password</string>
+    <string name="forgot_confirm">Confirm New Password</string>
     <string name="forgot_set">Set New Password</string>
     <string name="phone_label">Add Phone</string>
     <string name="phone_uploading">Uploading</string>

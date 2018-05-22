@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="16dp"
         android:orientation="horizontal"
         android:visibility="gone">
         <LinearLayout
@@ -52,6 +52,7 @@
                     android:id="@+id/forgot_code0"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:hint="@string/forgot_hint"
                     android:textColor="@android:color/white"
                     android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
             </LinearLayout>
@@ -69,6 +70,7 @@
                     android:id="@+id/forgot_code1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:hint="@string/forgot_hint"
                     android:textColor="@android:color/white"
                     android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
             </LinearLayout>
@@ -86,6 +88,7 @@
                     android:id="@+id/forgot_code2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:hint="@string/forgot_hint"
                     android:textColor="@android:color/white"
                     android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
             </LinearLayout>
@@ -103,6 +106,7 @@
                     android:id="@+id/forgot_code3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:hint="@string/forgot_hint"
                     android:textColor="@android:color/white"
                     android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
             </LinearLayout>
@@ -120,6 +124,7 @@
                     android:id="@+id/forgot_code4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:hint="@string/forgot_hint"
                     android:textColor="@android:color/white"
                     android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
             </LinearLayout>
@@ -137,6 +142,7 @@
                     android:id="@+id/forgot_code5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:hint="@string/forgot_hint"
                     android:textColor="@android:color/white"
                     android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
             </LinearLayout>
@@ -149,6 +155,7 @@
         android:layout_marginBottom="8dp"
         android:hint="@string/forgot_password"
         android:inputType="textPassword"
+        android:imeOptions="actionNext"
         android:textColor="@android:color/white"
         android:textAppearance="@style/password_text"
         android:visibility="gone"/>
@@ -159,6 +166,7 @@
         android:layout_marginBottom="8dp"
         android:hint="@string/forgot_confirm"
         android:inputType="textPassword"
+        android:imeOptions="actionSend"
         android:textColor="@android:color/white"
         android:textAppearance="@style/password_text"
         android:visibility="gone"/>
@@ -172,4 +180,11 @@
         android:textColor="@android:color/white"
         android:text="@string/forgot_set"
         android:visibility="gone"/>
+    <EditText
+        android:id="@+id/forgot_code_input"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:inputType="number"
+        android:maxLength="6"
+        android:imeOptions="actionNext"/>
 </LinearLayout>
