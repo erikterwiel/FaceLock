@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -35,9 +36,13 @@ public class AddPhoneActivity extends AppCompatActivity {
         mName = findViewById(R.id.phone_name);
         mAdd = findViewById(R.id.phone_add_phone);
 
-        mAdd.setOnClickListener(view ->
-            new UploadPhone().execute()
-        );
+        mAdd.setOnClickListener(view -> {
+            if (mName.getText().toString().equals("")) {
+                Toast.makeText(this, "Your phone must have a name!", Toast.LENGTH_LONG).show();
+            } else {
+                new UploadPhone().execute();
+            }
+        });
     }
 
     private class UploadPhone extends AsyncTask<Void, Void, Void> {
