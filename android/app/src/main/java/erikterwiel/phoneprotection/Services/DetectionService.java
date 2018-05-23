@@ -211,7 +211,8 @@ public class DetectionService extends IntentService {
 
         // Upload picture of intruder to S3
         String randomID = UUID.randomUUID().toString();
-        File file = new File(PATH_STREAM + "/Stream.jpg");
+        FileCompressor fileCompressor = new FileCompressor();
+        File file = new File(fileCompressor.compressImage(PATH_STREAM + "/Stream.jpg", this));
         TransferObserver observer = mTransferUtility.upload(
                 BUCKET_NAME,
                 mIntent.getStringExtra("username") + "/Intruder/" + randomID + ".jpg",
