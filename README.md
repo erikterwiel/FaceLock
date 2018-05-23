@@ -1,5 +1,5 @@
 
-![face lock showcase](https://user-images.githubusercontent.com/29645585/40404089-f33410ac-5e23-11e8-9b94-cf8524c50902.png)
+![face lock showcase 2](https://user-images.githubusercontent.com/29645585/40404184-7447af28-5e24-11e8-908f-b2dd2822b4d9.png)
 
 # Face Lock
 
