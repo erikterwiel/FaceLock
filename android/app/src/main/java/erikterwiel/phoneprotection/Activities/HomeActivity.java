@@ -283,7 +283,7 @@ public class HomeActivity extends AppCompatActivity {
             ObjectListing objectListing = mS3Client.listObjects(BUCKET_NAME);
             List<S3ObjectSummary> s3ObjList = objectListing.getObjectSummaries();
             for (S3ObjectSummary summary : s3ObjList) {
-                HashMap<String, Object> map = new HashMap<String, Object>();
+                HashMap<String, Object> map = new HashMap<>();
                 String key = summary.getKey();
                 if (key.contains(getIntent().getStringExtra("username")) &&
                         !key.contains("Intruder")) {
@@ -293,6 +293,11 @@ public class HomeActivity extends AppCompatActivity {
             }
             for (int i = 0; i < mTransferRecordMaps.size(); i++) {
                 beginDownload((String) mTransferRecordMaps.get(i).get("key"));
+            }
+            if (mTransferRecordMaps.isEmpty()) {
+                Intent addUserIntent = new Intent(HomeActivity.this, AddUserActivity.class);
+                addUserIntent.putExtra("username", getIntent().getStringExtra("username"));
+                startActivityForResult(addUserIntent, REQUEST_ADD);
             }
             return null;
         }
