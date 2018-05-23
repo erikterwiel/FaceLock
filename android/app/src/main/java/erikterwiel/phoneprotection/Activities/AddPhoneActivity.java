@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -52,6 +53,10 @@ public class AddPhoneActivity extends AppCompatActivity {
                 locationClient.getLastLocation().addOnSuccessListener(AddPhoneActivity.this, location -> {
                     if (location != null) {
                         mLocation = location;
+                    } else {
+                        mLocation = new Location("Default");
+                        mLocation.setLatitude(37.421984);
+                        mLocation.setLongitude(-122.084152);
                     }
                 });
             } catch (SecurityException ex) {

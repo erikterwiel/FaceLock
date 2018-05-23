@@ -63,10 +63,6 @@ public class RegisterActivity extends AppCompatActivity {
 
         mRegister.setOnClickListener(view -> {
             if (mPassword.getText().toString().equals(mConfirm.getText().toString())) {
-                mEmail.setFocusable(false);
-                mPassword.setFocusable(false);
-                mConfirm.setFocusable(false);
-                mRegister.setEnabled(false);
                 SignUpHandler signupCallback = new SignUpHandler() {
                     @Override
                     public void onSuccess(CognitoUser user, boolean signUpConfirmationState, CognitoUserCodeDeliveryDetails cognitoUserCodeDeliveryDetails) {
@@ -75,10 +71,6 @@ public class RegisterActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure(Exception exception) {
-                        mEmail.setFocusable(true);
-                        mPassword.setFocusable(true);
-                        mConfirm.setFocusable(true);
-                        mRegister.setEnabled(true);
                         Toast.makeText(RegisterActivity.this,
                                 exception.getClass().toString().split(" ")[1].split("\\.")[5],
                                 Toast.LENGTH_LONG).show();
@@ -119,10 +111,6 @@ public class RegisterActivity extends AppCompatActivity {
         }
         @Override
         protected void onPostExecute(Void result) {
-            mEmail.setFocusable(true);
-            mPassword.setFocusable(true);
-            mConfirm.setFocusable(true);
-            mRegister.setEnabled(true);
             Toast.makeText(RegisterActivity.this,
                     "Registration successful, please check email for two verification links. " +
                             "One is to verify your email, the other is receive pictures of phone intruders",
