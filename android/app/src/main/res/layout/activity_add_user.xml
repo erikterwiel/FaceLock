@@ -3,12 +3,25 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="16dp"
-    android:orientation="vertical">
+    android:padding="16dp"
+    android:orientation="vertical"
+    android:background="@color/colorPrimary"
+    android:gravity="center_horizontal">
+    <TextView
+        android:id="@+id/add_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:textColor="@android:color/white"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:text="@string/add_text"
+        android:gravity="center"/>
     <EditText
         android:id="@+id/add_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:hint="@string/add_name"
         android:inputType="textCapSentences|text"
         android:textColor="@android:color/black"
@@ -17,13 +30,12 @@
         android:id="@+id/add_image"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"/>
     <Button
         android:id="@+id/add_add"
-        android:layout_width="match_parent"
+        android:layout_width="256dp"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        android:textColor="@android:color/black"
+        android:background="@color/snsStatusBar"
+        android:textColor="@android:color/white"
         android:text="@string/add_add_image"/>
 </LinearLayout>

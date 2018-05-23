@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
@@ -35,6 +36,7 @@ public class AddUserActivity extends AppCompatActivity {
 
     private TransferUtility mTransferUtility;
     private MenuItem mDone;
+    private TextView mText;
     private EditText mName;
     private ImageView mImage;
     private Button mAdd;
@@ -47,6 +49,7 @@ public class AddUserActivity extends AppCompatActivity {
 
         mTransferUtility = S3.getInstance().getTransferUtility();
 
+        mText = findViewById(R.id.add_text);
         mName = findViewById(R.id.add_name);
         mImage = findViewById(R.id.add_image);
         mAdd = findViewById(R.id.add_add);
@@ -89,6 +92,7 @@ public class AddUserActivity extends AppCompatActivity {
         Log.i(TAG, "Uploading");
         observer.setTransferListener(new UploadListener());
         mImage.setImageDrawable(Drawable.createFromPath(mOutputPath));
+        mText.setText(R.string.add_text_after);
         mAdd.setText(R.string.add_replace_image);
     }
 

@@ -44,7 +44,9 @@
     <string name="settings_max_volume_description">Plays the siren at maximum volume instead of current audio volume.</string>
     <string name="add_label">Add User</string>
     <string name="add_done">Done</string>
-    <string name="add_name">User name</string>
+    <string name="add_text">Time to register yourself! First enter your name, then, use the button to take a picture of your face!</string>
+    <string name="add_text_after">Looking good!</string>
+    <string name="add_name">Name</string>
     <string name="add_add_image">Add Image</string>
     <string name="add_replace_image">Replace Image</string>
     <string name="edit_label">Manage Phones</string>
