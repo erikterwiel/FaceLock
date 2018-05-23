@@ -19,7 +19,7 @@
     <string name="forgot_confirm">Confirm New Password</string>
     <string name="forgot_set">Set New Password</string>
     <string name="phone_label">Add Phone</string>
-    <string name="phone_text">First, you'll need to give this phone a name.</string>
+    <string name="phone_text">First, you\'ll need to give this phone a name.</string>
     <string name="phone_uploading">Uploading</string>
     <string name="phone_wait">Please wait</string>
     <string name="phone_name">Phone name</string>

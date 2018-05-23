@@ -24,7 +24,7 @@
         android:layout_marginBottom="8dp"
         android:hint="@string/add_name"
         android:inputType="textCapSentences|text"
-        android:textColor="@android:color/black"
+        android:textColor="@android:color/white"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"/>
     <ImageView
         android:id="@+id/add_image"

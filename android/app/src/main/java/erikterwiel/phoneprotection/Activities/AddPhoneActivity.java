@@ -1,6 +1,5 @@
 package erikterwiel.phoneprotection.Activities;
 
-import android.app.ProgressDialog;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.provider.Settings;
@@ -46,15 +45,6 @@ public class AddPhoneActivity extends AppCompatActivity {
     }
 
     private class UploadPhone extends AsyncTask<Void, Void, Void> {
-        private ProgressDialog mDialog;
-
-        @Override
-        protected void onPreExecute() {
-            mDialog = ProgressDialog.show(AddPhoneActivity.this,
-                    getString(R.string.phone_uploading),
-                    getString(R.string.phone_wait));
-        }
-
         @Override
         protected Void doInBackground(Void... inputs) {
             try {
@@ -80,11 +70,6 @@ public class AddPhoneActivity extends AppCompatActivity {
             mMapper.save(account);
             finish();
             return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            mDialog.dismiss();
         }
     }
 }
