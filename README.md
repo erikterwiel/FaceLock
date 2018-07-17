@@ -10,3 +10,5 @@ Face Lock was started at HackPrinceton Fall 2017 and can be found on Devpost [he
 Our project represented a unique challenge of having equal importance in web and mobile development - which were integrated through Amazon Web Services. On a set background task interval, Face Lock uses the front facing camera and AWS Rekognition to check if the user is authorized to use the device. If the user is unauthorized, their photo is uploaded to AWS S3 and sent to the device's owner through text and email with AWS SNS. Simultaniously, Face Lock begins rapid location tracking and uploads the phone's coordinates to DynamoDB.
 
 This data stored on S3 and DynamoDB is then pulled down to our Node.js + EJS web app where the user can track their devices on our embedded Bing Maps and can view all previously identified intruders.
+
+The website is currently being updated to an Angular + Node.js app but the older version can be viewed from our previous release.
